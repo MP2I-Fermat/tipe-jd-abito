@@ -1,0 +1,13 @@
+{
+    "name": "OCaml bootstrap",
+    "build": {
+        "dockerfile": "../ocaml-bootstrap/Dockerfile"
+    },
+    // Emulate what the Dockerfile does by default.
+    "workspaceFolder": "/root/bootstrap",
+    "mounts": [
+        "source=${localWorkspaceFolder}/ocaml-bootstrap/build.sh,target=/root/bootstrap/build.sh,type=bind",
+        "source=${localWorkspaceFolder}/ocaml-bootstrap/Dockerfile,target=/root/bootstrap/Dockerfile,type=bind"
+    ],
+    "privileged": true
+}
