@@ -1,22 +1,20 @@
-rem print "hello world"
-rem dim astring as string
-rem dim aninteger as integer
-rem astring = "coucou"
-rem aninteger = 12
-rem print astring
-rem print aninteger
+rem A minimal C compiler written in BASIC
+rem Aims to compile tinycc
 
-rem dim thisisalist(5) as string
-rem thisisalist(0) = "test"
-rem thisisalist(1) = "test1"
-rem thisisalist(2) = "test2"
-rem thisisalist(3) = "test3"
-rem thisisalist(4) = "test4"
+rem Copyright (C) 2025  jd & abito
 
-rem dim index as integer
-rem input "Indice" ; index
+rem This program is free software: you can redistribute it and/or modify
+rem it under the terms of the GNU General Public License as published by
+rem the Free Software Foundation, either version 3 of the License, or
+rem (at your option) any later version.
 
-rem print thisisalist(index)
+rem This program is distributed in the hope that it will be useful,
+rem but WITHOUT ANY WARRANTY; without even the implied warranty of
+rem MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+rem GNU General Public License for more details.
+
+rem You should have received a copy of the GNU General Public License
+rem along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 option gosub
 
@@ -36,19 +34,38 @@ mainstart:
     gosub lexer
     goto mainend
 
+rem Sub lexer
+rem Turns the source file into a list of tokens
 lexer:
-    print "hello"
+    print "Lexer"
     mainloop:
         gosub parseonechar
-        print chr(current_char)
+        if current_char >= &h30 AndAlso current_char <= &h39 Then
+            gosub make_num
+        Else
+            print chr(current_char);
+        End If
         if current_char > 0 then goto mainloop
     return
 
+rem Sub parseonechar
+rem Updates current_char to the next char of the file and increments index
+rem Does not check if EOF is reached - please check if current_char is <> 0
+rem before calling
 parseonechar:
     Get #f, , current_char
     index += 1
     return
 
+rem Sub make_num
+rem Parses a number
+make_num:
+    print chr(current_char)
+    print "Detected number"
+    return
+
+rem Sub mainend
+rem Closes the source file and ends the program.
 mainend:
     Close #f
     End
