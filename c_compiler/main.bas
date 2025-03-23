@@ -19,8 +19,7 @@ rem along with this program.  If not, see <https://www.gnu.org/licenses/>.
 option gosub
 
 mainstart:
-    Dim f as Integer, s as String
-    Dim fl as long
+    Dim f as Integer
     Dim current_char as Ubyte
     Dim index as Long
 
@@ -64,7 +63,7 @@ make_num:
     print "Detected number"
     return
 
-rem Sub mainend
+rem Label mainend
 rem Closes the source file and ends the program.
 mainend:
     Close #f
