@@ -25,7 +25,7 @@ mainstart:
 
     f = FreeFile
 
-    Open "coucou.c" For Binary As #f
+    Open "coucou.preprocessed" For Binary As #f
     If Err > 0 Then Print "Error opening the file. Error code:"; Err : End
 
     index = -1
@@ -33,18 +33,19 @@ mainstart:
     gosub lexer
     goto mainend
 
+
 rem Sub lexer
 rem Turns the source file into a list of tokens
 lexer:
     print "Lexer"
-    mainloop:
+    lexer_mainloop:
         gosub parseonechar
         if current_char >= &h30 AndAlso current_char <= &h39 Then
             gosub make_num
         Else
             print chr(current_char);
         End If
-        if current_char > 0 then goto mainloop
+        if current_char > 0 then goto lexer_mainloop
     return
 
 rem Sub parseonechar
