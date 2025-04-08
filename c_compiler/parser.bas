@@ -69,7 +69,7 @@ rem Turns the source file into a list of tokens
 lexer:
     print "Lexer"
     lexer_mainloop:
-        gosub parseonechar
+        gosub nextchar
         if current_char >= &h30 andalso current_char <= &h39 then
             gosub make_num
         else
@@ -104,11 +104,11 @@ print_token:
 
     return
 
-rem Sub parseonechar
+rem Sub nextchar
 rem Updates current_char to the next char of the file and increments index
 rem Does not check if EOF is reached - please check if current_char is <> 0
 rem before calling
-parseonechar:
+nextchar:
     get #f, , current_char
     index += 1
     return
@@ -116,11 +116,19 @@ parseonechar:
 rem Sub make_num
 rem Parses a number
 make_num:
-    print chr(current_char)
-    print "Detected number"
+    print "Detected number "
+    dim current_num = 0
+
+    while &h30 <= current_char andalso current_char <= &h39
+        print chr(current_char); " "
+        current_num *= 10
+        current_num += current_char - &h30
+        gosub nextchar
+    wend
+
     temporary_token.value_str = ""
     temporary_token.value_float = 0.0
-    temporary_token.value_int = current_char - &h30
+    temporary_token.value_int = current_num
     temporary_token.pos_start = index
     temporary_token.pos_end = index
     temporary_token.tok_type = 1
