@@ -1,4 +1,6 @@
 main
 preprocessor
+parser
 *.gcc
 *.preprocessed
+*.cpp
