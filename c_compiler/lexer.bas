@@ -27,6 +27,7 @@ mainstart:
     rem  4 : bin
     rem  5 : float
     rem  6 : identifier
+    rem 60 : keyword
     rem  7 : (
     rem  8 : )
     rem  9 : {
@@ -35,6 +36,7 @@ mainstart:
     rem 12 : ]
     rem 13 : colon (:)
     rem 14 : semicolon (;)
+    rem 60 : keyword
     rem ===================
     type token
         value_str as string
@@ -48,6 +50,7 @@ mainstart:
     dim f as integer
     dim current_char as ubyte
     dim index as long
+    dim start_index as long
     dim temporary_token as token
     redim tokens(0 to 30) as token
     dim tok_index = 0
@@ -75,16 +78,25 @@ lexer:
         end if
 
         if current_char = 10 then
+            rem \n
             print chr(current_char);
             beginning_of_line = true
         elseif current_char >= &h30 andalso current_char <= &h39 then
+            rem numbers
             gosub make_num
-            beginning_of_line = false
+        elseif  (current_char >= &h41 andalso current_char <= &h5A) _
+             or (current_char >= &h61 andalso current_char <= &h7A) _
+             or (current_char = &h5F) _
+        then
+            rem identifiers. We’re doing C99, so no Unicode here
+            rem &h5F is underscore
+            gosub make_id  rem todo
         elseif beginning_of_line andalso current_char = 35 then  rem '#'
+            rem special preprocessor lines
             gosub skip_preprocessor_output
         elseif current_char <> 0 then
+            rem any other character
             print chr(current_char);
-            beginning_of_line = false
         end if
     loop while current_char <> 0
     return
@@ -115,7 +127,7 @@ rem Sub print_token
 rem prints the token stored in temporary_token in a pretty way ; used for
 rem debugging
 print_token:
-    print !"\""; temporary_token.value_str; !"\"\t";
+    print !"\""; temporary_token.value_str; !"\"\t\t";
     print temporary_token.value_int; !"\t";
     print temporary_token.value_float; !"\t";
     print temporary_token.tok_type; !"\t";
@@ -141,11 +153,12 @@ nextchar:
 rem Sub make_num
 rem Parses a number
 make_num:
-    print !"\nDetected number "
+    rem print !"\nDetected number "
     dim current_num = 0
+    start_index = index
 
     while &h30 <= current_char andalso current_char <= &h39
-        print chr(current_char);
+        rem print chr(current_char);
         current_num *= 10
         current_num += current_char - &h30
         gosub nextchar
@@ -154,19 +167,49 @@ make_num:
     temporary_token.value_str = ""
     temporary_token.value_float = 0.0
     temporary_token.value_int = current_num
-    temporary_token.pos_start = index
+    temporary_token.pos_start = start_index
     temporary_token.pos_end = index
     temporary_token.tok_type = 1
     gosub newtok
-    print !"\nEnd number"
+    rem print !"\nEnd number"
     return
+
+
+rem Sub make_id
+rem Parses an identifier
+make_id:
+    rem print !"\nDetected identifier "
+    dim current_id as string
+    current_id = ""
+    start_index = index
+
+    while (current_char >= &h41 andalso current_char <= &h5A) _
+       or (current_char >= &h61 andalso current_char <= &h7A) _
+       or (current_char >= &h30 andalso current_char <= &h39) _
+       or (current_char = &h5F)
+        rem print chr(current_char);
+        current_id += chr(current_char)
+        gosub nextchar
+    wend
+
+    temporary_token.value_str = current_id
+    temporary_token.value_float = 0.0
+    temporary_token.value_int = 0
+    temporary_token.pos_start = start_index
+    temporary_token.pos_end = index
+    temporary_token.tok_type = 6
+    gosub newtok
+    rem print !"\nEnd identifier"
+
+    return
+
 
 rem Label mainend
 rem Closes the source file and ends the program.
 mainend:
     close #f
     print !"\nTokens :"
-    print !"str\t int\t float\t type\t start\t end"
+    print !"str\t\t int\t float\t type\t start\t end"
     for i as integer = lbound(tokens) to tok_index-1
         temporary_token = tokens(i)
         gosub print_token

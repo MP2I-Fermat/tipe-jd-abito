@@ -1,6 +1,7 @@
 main
 preprocessor
 parser
+lexer
 *.gcc
 *.preprocessed
 *.cpp

@@ -4,8 +4,10 @@
 #define coucou 12
 #endif
 
+#define print printf
+
 int main() {
-    printf("hello world\n"); /* commentaire */
+    print("hello world\n"); /* commentaire */
     // commentaire
     /*
      *
