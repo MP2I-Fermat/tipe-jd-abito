@@ -18,6 +18,46 @@ rem along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 option gosub
 
+dim C_99_KEYWORDS(0 to 37) as string => { _
+    "auto", _
+    "break", _
+    "case", _
+    "char", _
+    "const", _
+    "continue", _
+    "default", _
+    "do", _
+    "double", _
+    "else", _
+    "enum", _
+    "extern", _
+    "float", _
+    "for", _
+    "goto", _
+    "if", _
+    "inline", _
+    "int", _
+    "long", _
+    "register", _
+    "restrict", _
+    "return", _
+    "short", _
+    "signed", _
+    "sizeof", _
+    "static", _
+    "struct", _
+    "switch", _
+    "typedef", _
+    "union", _
+    "unsigned", _
+    "void", _
+    "volatile", _
+    "while", _
+    "_Bool", _
+    "_Complex", _
+    "_Imaginary" _
+}
+
 mainstart:
     rem === TOKEN TYPES ===
     rem  0 : [undefined]
@@ -52,7 +92,7 @@ mainstart:
     dim index as long
     dim start_index as long
     dim temporary_token as token
-    redim tokens(0 to 30) as token
+    redim tokens(0 to 32) as token
     dim tok_index = 0
     dim beginning_of_line = true
 
@@ -75,7 +115,7 @@ lexer:
         gosub nextchar
         if index = 0 then
             beginning_of_line = true
-        end if
+        endif
 
         if current_char = 10 then
             rem \n
@@ -90,14 +130,14 @@ lexer:
         then
             rem identifiers. We’re doing C99, so no Unicode here
             rem &h5F is underscore
-            gosub make_id  rem todo
+            gosub make_id
         elseif beginning_of_line andalso current_char = 35 then  rem '#'
             rem special preprocessor lines
             gosub skip_preprocessor_output
         elseif current_char <> 0 then
             rem any other character
             print chr(current_char);
-        end if
+        endif
     loop while current_char <> 0
     return
 
@@ -117,7 +157,7 @@ rem resizing it
 newtok:
     if tok_index = ubound(tokens) then
         redim preserve tokens(0 to ubound(tokens)*2)
-    end if
+    endif
     tokens(tok_index) = temporary_token
     tok_index += 1
 
@@ -197,7 +237,15 @@ make_id:
     temporary_token.value_int = 0
     temporary_token.pos_start = start_index
     temporary_token.pos_end = index
+
     temporary_token.tok_type = 6
+    for i1 as integer = lbound(C_99_KEYWORDS) to ubound(C_99_KEYWORDS)
+        if current_id = C_99_KEYWORDS(i1) then
+            temporary_token.tok_type = 60
+            exit for
+        endif
+    next
+
     gosub newtok
     rem print !"\nEnd identifier"
 
