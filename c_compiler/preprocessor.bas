@@ -1,3 +1,4 @@
+rem TIPE – C compiler
 rem A minimal C compiler written in BASIC
 rem Aims to compile tinycc
 

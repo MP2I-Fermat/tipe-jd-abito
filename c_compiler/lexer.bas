@@ -1,3 +1,4 @@
+rem TIPE – C compiler
 rem A minimal C compiler written in BASIC
 rem Aims to compile tinycc
 
@@ -63,22 +64,16 @@ mainstart:
     rem  0 : [undefined]
     rem  1 : integer
     rem  2 : hex
-    rem  3 : oct
-    rem  4 : bin
     rem  5 : float
     rem  6 : identifier
     rem 60 : keyword
     rem  7 : [
     rem up to this point : todo
-    rem  7 : <:
     rem  8 : ]
-    rem  8 : :>
     rem  9 : (
     rem 10 : )
     rem 11 : {
-    rem 11 : <%
     rem 12 : }
-    rem 12 : %>
     rem 13 : .
     rem 14 : ->
     rem 15 : ++
@@ -118,6 +113,14 @@ mainstart:
     rem 49 : string
     rem 50 : char ('X')
     rem 60 : keyword
+    rem The following tokens are not used in tinycc, so they will not be
+    rem implemented
+    rem  3 : oct (will not be implemented)
+    rem  4 : bin (will not be implemented)
+    rem  7 : <:  (will not be implemented)
+    rem  8 : :>  (will not be implemented)
+    rem 11 : <%  (will not be implemented)
+    rem 12 : %>  (will not be implemented)
     rem ===================
     type token
         value_str as string
@@ -198,7 +201,8 @@ skip_preprocessor_output:
 
 rem Sub init_temp_token
 rem Reinitialises the global temporary_token variable to default values
-rem (0s everywhere)
+rem (0s everywhere (except pos_start and pos_end, which are initialised with
+rem `index`))
 init_temp_token:
     temporary_token.value_str = ""
     temporary_token.value_float = 0.0
@@ -235,7 +239,7 @@ print_token:
 
 rem Sub nextchar
 rem Updates current_char to the next char of the file and increments index
-rem Does not check if EOF is reached - please check if current_char is <> 0
+rem Does not check if EOF is reached - please check that current_char is <> 0
 rem before calling
 nextchar:
     if current_char = 10 then
@@ -250,12 +254,10 @@ nextchar:
 rem Sub make_num
 rem Parses a number
 make_num:
-    rem print !"\nDetected number "
     dim current_num = 0
     start_index = index
 
     while &h30 <= current_char andalso current_char <= &h39
-        rem print chr(current_char);
         current_num *= 10
         current_num += current_char - &h30
         gosub nextchar
@@ -267,14 +269,12 @@ make_num:
     temporary_token.pos_end = index
     temporary_token.tok_type = 1
     gosub newtok
-    rem print !"\nEnd number"
     return
 
 
 rem Sub make_id
 rem Parses an identifier
 make_id:
-    rem print !"\nDetected identifier "
     dim current_id as string
     current_id = ""
     start_index = index
@@ -283,7 +283,6 @@ make_id:
        or (current_char >= &h61 andalso current_char <= &h7A) _
        or (current_char >= &h30 andalso current_char <= &h39) _
        or (current_char = &h5F)
-        rem print chr(current_char);
         current_id += chr(current_char)
         gosub nextchar
     wend
@@ -302,13 +301,12 @@ make_id:
     next
 
     gosub newtok
-    rem print !"\nEnd identifier"
 
     return
 
 
 rem Label mainend
-rem Closes the source file and ends the program.
+rem Closes the source file, prints tokens and ends the program.
 mainend:
     close #f
     print !"\nTokens :"
