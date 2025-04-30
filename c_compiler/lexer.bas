@@ -20,7 +20,6 @@ rem along with this program.  If not, see <https://www.gnu.org/licenses/>.
 option gosub
 
 dim C_99_KEYWORDS(0 to 37) as string => { _
-    "auto", _
     "break", _
     "case", _
     "char", _
@@ -54,10 +53,12 @@ dim C_99_KEYWORDS(0 to 37) as string => { _
     "void", _
     "volatile", _
     "while", _
-    "_Bool", _
-    "_Complex", _
-    "_Imaginary" _
+    "_Bool" _
 }
+rem Not used in tinycc (not included in the above list):
+rem auto
+rem _Complex
+rem _Imaginary
 
 mainstart:
     rem === TOKEN TYPES ===
