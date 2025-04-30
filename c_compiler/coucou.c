@@ -2,11 +2,11 @@
 #include <stdio.h>
 #ifndef coucou
 #define coucou 12
-#endif
+%:endif
 
 #define print printf
 
-int main() {
+int main() <%
     print("hello world\n"); /* commentaire */
     // commentaire
     /*
@@ -14,4 +14,4 @@ int main() {
      * commentaire
      */
     return 10;
-}
+%>

@@ -68,14 +68,55 @@ mainstart:
     rem  5 : float
     rem  6 : identifier
     rem 60 : keyword
-    rem  7 : (
-    rem  8 : )
-    rem  9 : {
-    rem 10 : }
-    rem 11 : [
-    rem 12 : ]
-    rem 13 : colon (:)
-    rem 14 : semicolon (;)
+    rem  7 : [
+    rem up to this point : todo
+    rem  7 : <:
+    rem  8 : ]
+    rem  8 : :>
+    rem  9 : (
+    rem 10 : )
+    rem 11 : {
+    rem 11 : <%
+    rem 12 : }
+    rem 12 : %>
+    rem 13 : .
+    rem 14 : ->
+    rem 15 : ++
+    rem 16 : --
+    rem 17 : &
+    rem 18 : *
+    rem 19 : +
+    rem 20 : -
+    rem 21 : ~
+    rem 22 : !
+    rem 23 : /
+    rem 24 : %
+    rem 25 : <<
+    rem 26 : >>
+    rem 27 : <
+    rem 28 : >
+    rem 29 : <=
+    rem 30 : >=
+    rem 31 : ==
+    rem 32 : !=
+    rem 33 : ^
+    rem 34 : |
+    rem 35 : &&
+    rem 36 : ||
+    rem 37 : ?
+    rem 38 : :
+    rem 39 : ;
+    rem 40 : ...
+    rem 41 : =
+    rem 42 : *=
+    rem 43 : /=
+    rem 44 : %=
+    rem 45 : +=
+    rem 46 : -=
+    rem 47 : <<=
+    rem 48 : ,
+    rem 49 : string
+    rem 50 : char ('X')
     rem 60 : keyword
     rem ===================
     type token
@@ -134,6 +175,10 @@ lexer:
         elseif beginning_of_line andalso current_char = 35 then  rem '#'
             rem special preprocessor lines
             gosub skip_preprocessor_output
+        elseif (chr(current_char) = "[") then
+            gosub init_temp_token
+            temporary_token.tok_type = 7
+            gosub newtok
         elseif current_char <> 0 then
             rem any other character
             print chr(current_char);
@@ -150,6 +195,18 @@ skip_preprocessor_output:
     wend
     return
 
+
+rem Sub init_temp_token
+rem Reinitialises the global temporary_token variable to default values
+rem (0s everywhere)
+init_temp_token:
+    temporary_token.value_str = ""
+    temporary_token.value_float = 0.0
+    temporary_token.value_int = 0
+    temporary_token.pos_start = index
+    temporary_token.pos_end = index
+    temporary_token.tok_type = 0
+    return
 
 rem Sub newtok
 rem Adds the token stored in temporary_token to the tokens array, eventually
@@ -204,8 +261,7 @@ make_num:
         gosub nextchar
     wend
 
-    temporary_token.value_str = ""
-    temporary_token.value_float = 0.0
+    gosub init_temp_token
     temporary_token.value_int = current_num
     temporary_token.pos_start = start_index
     temporary_token.pos_end = index
@@ -232,9 +288,8 @@ make_id:
         gosub nextchar
     wend
 
+    gosub init_temp_token
     temporary_token.value_str = current_id
-    temporary_token.value_float = 0.0
-    temporary_token.value_int = 0
     temporary_token.pos_start = start_index
     temporary_token.pos_end = index
 
