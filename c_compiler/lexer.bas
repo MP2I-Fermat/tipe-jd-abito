@@ -240,12 +240,12 @@ lexer:
             gosub nextchar
             if (chr(current_char) = ".") then
                 gosub nextchar
-                if (chr(current_char) <> ".") then
+                if (chr(current_char) <> ".") then  rem ...
                     errmsg = "Expected '.' after '..'"
                     goto exception
                 endif
                 temporary_token.tok_type = 40
-            else
+            else  rem .
                 do_not_advance = true
                 temporary_token.tok_type = 13
             endif
@@ -522,7 +522,7 @@ make_id:
     return
 
 
-rem Label error
+rem Label exception
 rem Closes the source file, prints the error message in errmsg and ends the
 rem program
 exception:
