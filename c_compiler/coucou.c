@@ -6,7 +6,7 @@
 
 #define print printf
 
-int main() <%
+int main() {
     print("hello world\n"); /* commentaire */
     // commentaire
     /*
@@ -14,4 +14,4 @@ int main() <%
      * commentaire
      */
     return 10;
-%>
+}

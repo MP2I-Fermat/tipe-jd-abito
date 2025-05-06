@@ -2,6 +2,7 @@ main
 preprocessor
 parser
 lexer
+test.c
 *.gcc
 *.preprocessed
 *.cpp

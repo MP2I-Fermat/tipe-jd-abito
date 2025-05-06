@@ -64,12 +64,11 @@ mainstart:
     rem === TOKEN TYPES ===
     rem  0 : [undefined]
     rem  1 : integer
-    rem  2 : hex
-    rem  5 : float
+    rem  2 : hex  -- todo
+    rem  5 : float -- todo
     rem  6 : identifier
     rem 60 : keyword
     rem  7 : [
-    rem up to this point : todo
     rem  8 : ]
     rem  9 : (
     rem 10 : )
@@ -110,9 +109,13 @@ mainstart:
     rem 45 : +=
     rem 46 : -=
     rem 47 : <<=
-    rem 48 : ,
-    rem 49 : string
-    rem 50 : char ('X')
+    rem 48 : >>=
+    rem 49 : &=
+    rem 50 : ^=
+    rem 51 : |=
+    rem 52 : ,
+    rem 53 : string -- note: \x is unused in tinycc -- todo
+    rem 54 : char ('X') -- todo
     rem 60 : keyword
     rem The following tokens are not used in tinycc, so they will not be
     rem implemented
@@ -136,14 +139,18 @@ mainstart:
     dim current_char as ubyte
     dim index as long
     dim start_index as long
+    dim errmsg as string
+
     dim temporary_token as token
     redim tokens(0 to 32) as token
     dim tok_index = 0
+
     dim beginning_of_line = true
+    dim do_not_advance = false
 
     f = freefile
 
-    open "coucou.cpp" for binary as #f
+    open "test.c" for binary as #f
     if err > 0 then print "Error opening the file. Error code:"; err : end
 
     index = -1
@@ -157,7 +164,12 @@ rem Turns the source file into a list of tokens
 lexer:
     print "Lexer"
     do
-        gosub nextchar
+        if not do_not_advance then
+            gosub nextchar
+        else
+            do_not_advance = false
+        endif
+
         if index = 0 then
             beginning_of_line = true
         endif
@@ -182,6 +194,207 @@ lexer:
         elseif (chr(current_char) = "[") then
             gosub init_temp_token
             temporary_token.tok_type = 7
+            gosub newtok
+        elseif (chr(current_char) = "]") then
+            gosub init_temp_token
+            temporary_token.tok_type = 8
+            gosub newtok
+        elseif (chr(current_char) = "(") then
+            gosub init_temp_token
+            temporary_token.tok_type = 9
+            gosub newtok
+        elseif (chr(current_char) = ")") then
+            gosub init_temp_token
+            temporary_token.tok_type = 10
+            gosub newtok
+        elseif (chr(current_char) = "{") then
+            gosub init_temp_token
+            temporary_token.tok_type = 11
+            gosub newtok
+        elseif (chr(current_char) = "}") then
+            gosub init_temp_token
+            temporary_token.tok_type = 12
+            gosub newtok
+        elseif (chr(current_char) = "~") then
+            gosub init_temp_token
+            temporary_token.tok_type = 21
+            gosub newtok
+        elseif (chr(current_char) = "?") then
+            gosub init_temp_token
+            temporary_token.tok_type = 37
+            gosub newtok
+        elseif (chr(current_char) = ":") then
+            gosub init_temp_token
+            temporary_token.tok_type = 38
+            gosub newtok
+        elseif (chr(current_char) = ";") then
+            gosub init_temp_token
+            temporary_token.tok_type = 39
+            gosub newtok
+        elseif (chr(current_char) = ",") then
+            gosub init_temp_token
+            temporary_token.tok_type = 52
+            gosub newtok
+        elseif (chr(current_char) = ".") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = ".") then
+                gosub nextchar
+                if (chr(current_char) <> ".") then
+                    errmsg = "Expected '.' after '..'"
+                    goto exception
+                endif
+                temporary_token.tok_type = 40
+            else
+                do_not_advance = true
+                temporary_token.tok_type = 13
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "-") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = ">") then  rem ->
+                temporary_token.tok_type = 14
+            elseif (chr(current_char) = "-") then  rem --
+                temporary_token.tok_type = 16
+            elseif (chr(current_char) = "=") then  rem -=
+                temporary_token.tok_type = 46
+            else  rem -
+                temporary_token.tok_type = 20
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "+") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "+") then  rem ++
+                temporary_token.tok_type = 15
+            elseif (chr(current_char) = "=") then  rem +=
+                temporary_token.tok_type = 45
+            else  rem +
+                temporary_token.tok_type = 19
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "&") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "&") then  rem &&
+                temporary_token.tok_type = 35
+            elseif (chr(current_char) = "=") then  rem &=
+                temporary_token.tok_type = 49
+            else  rem &
+                temporary_token.tok_type = 17
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "*") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem *=
+                temporary_token.tok_type = 42
+            else  rem *
+                temporary_token.tok_type = 18
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "!") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem !=
+                temporary_token.tok_type = 32
+            else  rem !
+                temporary_token.tok_type = 22
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "/") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem /=
+                temporary_token.tok_type = 43
+            else  rem /
+                temporary_token.tok_type = 23
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "%") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem %=
+                temporary_token.tok_type = 44
+            else  rem %
+                temporary_token.tok_type = 24
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "<") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "<") then  rem <<
+                gosub nextchar
+                if (chr(current_char) = "=") then  rem <<=
+                    temporary_token.tok_type = 47
+                else  rem <<
+                    temporary_token.tok_type = 25
+                    do_not_advance = true
+                endif
+            elseif (chr(current_char) = "=") then  rem <=
+                temporary_token.tok_type = 29
+            else  rem <
+                temporary_token.tok_type = 27
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = ">") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = ">") then  rem >>
+                gosub nextchar
+                if (chr(current_char) = "=") then  rem >>=
+                    temporary_token.tok_type = 48
+                else  rem >>
+                    temporary_token.tok_type = 26
+                    do_not_advance = true
+                endif
+            elseif (chr(current_char) = "=") then  rem >=
+                temporary_token.tok_type = 30
+            else  rem >
+                temporary_token.tok_type = 28
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "=") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem ==
+                temporary_token.tok_type = 31
+            else  rem =
+                temporary_token.tok_type = 41
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "^") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem ^=
+                temporary_token.tok_type = 50
+            else  rem ^
+                temporary_token.tok_type = 33
+                do_not_advance = true
+            endif
+            gosub newtok
+        elseif (chr(current_char) = "|") then
+            gosub init_temp_token
+            gosub nextchar
+            if (chr(current_char) = "=") then  rem |=
+                temporary_token.tok_type = 51
+            elseif (chr(current_char) = "|") then  rem ||
+                temporary_token.tok_type = 36
+            else  rem |
+                temporary_token.tok_type = 34
+                do_not_advance = true
+            endif
             gosub newtok
         elseif current_char <> 0 then
             rem any other character
@@ -270,6 +483,7 @@ make_num:
     temporary_token.pos_end = index
     temporary_token.tok_type = 1
     gosub newtok
+    do_not_advance = true
     return
 
 
@@ -303,7 +517,19 @@ make_id:
 
     gosub newtok
 
+    do_not_advance = true
+
     return
+
+
+rem Label error
+rem Closes the source file, prints the error message in errmsg and ends the
+rem program
+exception:
+    close #f
+    print "Error: "; errmsg
+    erase tokens
+    end
 
 
 rem Label mainend
