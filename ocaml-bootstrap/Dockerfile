@@ -6,11 +6,11 @@ WORKDIR /root/bootstrap/sources
 # in the build process beyond menial tasks that could trivially (albeit
 # painfully) be done by hand.
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-        && apt-get install -y git make file
+        && apt-get install -y git make file curl xz-utils
 
 # Install build dependencies. The end goal of this project is to have none of
 # these.
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y guile-3.0 gcc g++ libgmp-dev libmpfr-dev libmpc-dev flex
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gcc g++ libgmp-dev libmpfr-dev libmpc-dev libunistring-dev libffi-dev libgc-dev flex
 
 RUN git config --global protocol.file.allow always \
         && git config --global advice.detachedHead false
@@ -22,7 +22,11 @@ RUN git clone --mirror --progress https://github.com/ocaml/ocaml.git ocaml.git
 RUN git clone -s gcc.git gcc-11.5.0 \
         && git -C gcc-11.5.0 checkout releases/gcc-11.5.0
 
-RUN git clone  --progress git://sourceware.org/git/glibc.git glibc-2.33 \
+RUN curl https://ftp.gnu.org/gnu/guile/guile-3.0.10.tar.xz -o guile-3.0.10.tar.xz \
+        && tar xf guile-3.0.10.tar.xz \
+        && rm guile-3.0.10.tar.xz
+
+RUN git clone --progress git://sourceware.org/git/glibc.git glibc-2.33 \
         # Check out the latest version of glibc that doesn't have a variable SIGSTKSZ
         # We won't actually compile this, we'll just use the headers it provides.
         # This is about as hacky as it gets :P

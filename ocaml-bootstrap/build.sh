@@ -38,7 +38,7 @@ if [[ ! -e "/build.sh" ]]; then
     ln -s "usr/lib64" "$DEPENDENCIES/lib64"
 
     # We definitely need to replace these.
-    cp /bin/{gcc,g++,flex,m4,as,nm,objcopy,objdump,readelf,ld,guile} "$DEPENDENCIES/bin"
+    cp /bin/{gcc,g++,flex,m4,as,nm,objcopy,objdump,readelf,ld} "$DEPENDENCIES/bin"
 
     cp "$0" "$DEPENDENCIES" # Workaround for bind mount in devcontainer
 
@@ -63,6 +63,23 @@ echo "experimental" > ../gcc/DEV-PHASE
 ../configure --disable-multilib --enable-languages=c
 
 make -j$(nproc) bootstrap
+make install
+
+
+cd /guile-3.0.10
+
+# Binary doc files that were removed, but that `make` depends on for generating
+# docs.
+touch doc/ref/hierarchy.pdf
+touch doc/ref/hierarchy.png
+touch doc/ref/gds.pdf
+touch doc/ref/scheme.pdf
+
+# *_CFLAGS must be non-empty to skip pkg-config
+LIBFFI_CFLAGS=" " LIBFFI_LIBS="-lffi" \
+    BDW_GC_CFLAGS=" " BDW_GC_LIBS="-lgc -lpthread -ldl" \
+    ./configure
+make -j$(nproc)
 make install
 
 
