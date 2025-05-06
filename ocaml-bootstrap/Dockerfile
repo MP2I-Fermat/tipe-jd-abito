@@ -10,7 +10,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 # Install build dependencies. The end goal of this project is to have none of
 # these.
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gcc g++ libgmp-dev libmpfr-dev libmpc-dev libunistring-dev libffi-dev libgc-dev flex
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gcc g++ libgmp-dev libmpfr-dev libmpc-dev flex
 
 RUN git config --global protocol.file.allow always \
         && git config --global advice.detachedHead false
@@ -21,6 +21,18 @@ RUN git clone --mirror --progress https://github.com/ocaml/ocaml.git ocaml.git
 
 RUN git clone -s gcc.git gcc-11.5.0 \
         && git -C gcc-11.5.0 checkout releases/gcc-11.5.0
+
+RUN curl -L https://github.com/libffi/libffi/releases/download/v3.4.8/libffi-3.4.8.tar.gz -o libffi-3.4.8.tar.gz \
+        && tar xf libffi-3.4.8.tar.gz \
+        && rm libffi-3.4.8.tar.gz
+
+RUN curl https://www.hboehm.info/gc/gc_source/gc-8.2.8.tar.gz -o gc-8.2.8.tar.gz \
+        && tar xf gc-8.2.8.tar.gz \
+        && rm gc-8.2.8.tar.gz
+
+RUN curl https://ftp.gnu.org/gnu/libunistring/libunistring-1.3.tar.xz -o libunistring-1.3.tar.xz \
+        && tar xf libunistring-1.3.tar.xz \
+        && rm libunistring-1.3.tar.xz
 
 RUN curl https://ftp.gnu.org/gnu/guile/guile-3.0.10.tar.xz -o guile-3.0.10.tar.xz \
         && tar xf guile-3.0.10.tar.xz \

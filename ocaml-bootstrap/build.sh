@@ -22,7 +22,7 @@ if [[ ! -e "/build.sh" ]]; then
     mkdir -p "$DEPENDENCIES/"{dev,tmp,usr/lib,usr/bin,usr/lib64}
 
     # Menial task automation. We don't need to replace these.
-    cp /bin/{bash,ls,make,nproc,rm,find,xargs,touch,cp,sh,sed,mkdir,cat,uname,head,grep,tr,sort,uniq,chmod,expr,ln,awk,mv,ar,env,date,rmdir,egrep,diff,sleep,cmp,ranlib,strip,file,arch,hostname,dirname,basename,true,gzip,tar,cut,patch} \
+    cp /bin/{bash,ls,make,nproc,rm,find,xargs,touch,cp,sh,sed,mkdir,cat,uname,head,grep,tr,sort,uniq,chmod,expr,ln,awk,mv,ar,env,date,rmdir,egrep,diff,sleep,cmp,ranlib,strip,file,arch,hostname,dirname,basename,true,gzip,tar,cut,patch,wc,tail} \
         "$DEPENDENCIES/usr/bin/"
 
     # Link "$DEPENDENCIES/bin" to "$DEPENDENCIES/usr/bin" - not the real /usr/bin
@@ -63,6 +63,27 @@ echo "experimental" > ../gcc/DEV-PHASE
 ../configure --disable-multilib --enable-languages=c
 
 make -j$(nproc) bootstrap
+make install
+
+
+cd /libffi-3.4.8
+
+./configure --disable-docs
+make -j$(nproc)
+make install
+
+
+cd /gc-8.2.8
+
+./configure
+make -j$(nproc)
+make install
+
+
+cd /libunistring-1.3 
+
+./configure
+make -j$(nproc)
 make install
 
 
