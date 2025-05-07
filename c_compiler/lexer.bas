@@ -396,6 +396,20 @@ lexer:
                 do_not_advance = true
             endif
             gosub newtok
+        elseif (chr(current_char) = !"\"") then  rem strings
+            gosub init_temp_token
+            gosub nextchar
+
+            dim current_string as string
+            current_string = ""
+
+            while (chr(current_char) <> !"\"")
+                current_string = current_string + chr(current_char)
+                gosub nextchar
+            wend
+            temporary_token.value_str = current_string
+            temporary_token.tok_type = 53
+            gosub newtok
         elseif current_char <> 0 then
             rem any other character
             print chr(current_char);
