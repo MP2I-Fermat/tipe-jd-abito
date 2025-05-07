@@ -114,7 +114,7 @@ mainstart:
     rem 50 : ^=
     rem 51 : |=
     rem 52 : ,
-    rem 53 : string -- note: \x is unused in tinycc -- todo
+    rem 53 : string -- note: \x and L"" are unused in tinycc -- todo
     rem 54 : char ('X') -- todo
     rem 60 : keyword
     rem The following tokens are not used in tinycc, so they will not be
