@@ -128,8 +128,8 @@ mainstart:
     rem ===================
     type token
         value_str as string
-        value_int as long
-        value_float as single
+        value_int as longint
+        value_float as double
         tok_type as integer
         pos_start as integer
         pos_end as integer
@@ -538,7 +538,12 @@ nextchar:
 rem Sub make_num
 rem Parses a number
 make_num:
-    dim current_num = 0
+    dim current_num as longint
+    dim current_float as double
+    current_num = 0
+    current_float = 0.0
+    dim is_float = false
+    dim current_power_of_ten = 10
     start_index = index
 
     if current_char = &h30 then
@@ -560,18 +565,37 @@ make_num:
             gosub nextchar
         wend
     else
-        while &h30 <= current_char andalso current_char <= &h39
-            current_num *= 10
-            current_num += current_char - &h30
+        while (&h30 <= current_char andalso current_char <= &h39) or current_char = &h2E
+            if current_char = &h2E then
+                if is_float then
+                    errmsg = "A float can not have two dots"
+                    gosub exception
+                endif
+                is_float = true
+                current_float = cdbl(current_num)
+            elseif is_float then
+                rem TODO improve this
+                current_float += cdbl(current_char - &h30) / current_power_of_ten
+                print current_float
+                current_power_of_ten *= 10
+            else
+                current_num *= 10
+                current_num += current_char - &h30
+            endif
             gosub nextchar
         wend
     endif
 
     gosub init_temp_token
-    temporary_token.value_int = current_num
     temporary_token.pos_start = start_index
     temporary_token.pos_end = index
-    temporary_token.tok_type = 1
+    if is_float then
+        temporary_token.tok_type = 5
+        temporary_token.value_float = current_float
+    else
+        temporary_token.tok_type = 1
+        temporary_token.value_int = current_num
+    endif
     gosub newtok
     do_not_advance = true
     return
