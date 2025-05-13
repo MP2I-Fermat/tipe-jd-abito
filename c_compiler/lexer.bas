@@ -65,7 +65,7 @@ mainstart:
     rem  0 : [undefined]
     rem  1 : integer
     rem  1 : hex
-    rem  5 : float -- todo
+    rem  5 : float
     rem  6 : identifier
     rem 60 : keyword
     rem  7 : [
