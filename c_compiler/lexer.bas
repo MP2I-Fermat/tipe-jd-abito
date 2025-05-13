@@ -148,6 +148,8 @@ mainstart:
     dim beginning_of_line = true
     dim do_not_advance = false
 
+    dim encountered_escape_seq_character = false
+
     f = freefile
 
     open "test.c" for binary as #f
@@ -402,9 +404,29 @@ lexer:
 
             dim current_string as string
             current_string = ""
+            encountered_escape_seq_character = false
 
-            while (chr(current_char) <> !"\"")
-                current_string = current_string + chr(current_char)
+            while (encountered_escape_seq_character or (chr(current_char) <> !"\"" and current_char <> 0))
+                if encountered_escape_seq_character then
+                    encountered_escape_seq_character = false
+                    if chr(current_char) = "\" then
+                        current_string = current_string + "\"
+                    elseif chr(current_char) = "n" then
+                        current_string = current_string + !"\n"
+                    elseif chr(current_char) = "t" then
+                        current_string = current_string + !"\t"
+                    elseif chr(current_char) = "0" then
+                        current_string = current_string + chr(0)
+                    elseif chr(current_char) = !"\"" then
+                        current_string = current_string + !"\""
+                    elseif chr(current_char) = "'" then
+                        current_string = current_string + "'"
+                    endif
+                elseif chr(current_char) = "\" then
+                    encountered_escape_seq_character = true
+                else
+                    current_string = current_string + chr(current_char)
+                endif
                 gosub nextchar
             wend
             temporary_token.value_str = current_string
