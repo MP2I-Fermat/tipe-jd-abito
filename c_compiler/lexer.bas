@@ -64,7 +64,7 @@ mainstart:
     rem === TOKEN TYPES ===
     rem  0 : [undefined]
     rem  1 : integer
-    rem  2 : hex  -- todo
+    rem  1 : hex
     rem  5 : float -- todo
     rem  6 : identifier
     rem 60 : keyword
@@ -119,8 +119,8 @@ mainstart:
     rem 60 : keyword
     rem The following tokens are not used in tinycc, so they will not be
     rem implemented
-    rem  3 : oct (will not be implemented)
-    rem  4 : bin (will not be implemented)
+    rem  1 : oct (will not be implemented)
+    rem  1 : bin (will not be implemented)
     rem  7 : <:  (will not be implemented)
     rem  8 : :>  (will not be implemented)
     rem 11 : <%  (will not be implemented)
@@ -541,11 +541,31 @@ make_num:
     dim current_num = 0
     start_index = index
 
-    while &h30 <= current_char andalso current_char <= &h39
-        current_num *= 10
-        current_num += current_char - &h30
+    if current_char = &h30 then
         gosub nextchar
-    wend
+    endif
+    if chr(current_char) = "x" then  rem hexadecimal
+        gosub nextchar
+        while (&h30 <= current_char andalso current_char <= &h39) or _
+              (&h41 <= current_char andalso current_char <= &h46) or _
+              (&h61 <= current_char andalso current_char <= &h66)
+            current_num *= 16
+            if current_char <= &h39 then
+                current_num += current_char - &h30
+            elseif current_char <= &h46 then
+                current_num += 10 + current_char - &h41
+            elseif current_char <= &h66 then
+                current_num += 10 + current_char - &h61
+            endif
+            gosub nextchar
+        wend
+    else
+        while &h30 <= current_char andalso current_char <= &h39
+            current_num *= 10
+            current_num += current_char - &h30
+            gosub nextchar
+        wend
+    endif
 
     gosub init_temp_token
     temporary_token.value_int = current_num
