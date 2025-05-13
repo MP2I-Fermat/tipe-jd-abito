@@ -10,7 +10,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
 
 # Install build dependencies. The end goal of this project is to have none of
 # these.
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gcc g++ libgmp-dev libmpfr-dev libmpc-dev flex
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tcc binutils libgmp-dev libmpfr-dev libmpc-dev
 
 RUN git config --global protocol.file.allow always \
         && git config --global advice.detachedHead false
@@ -19,8 +19,32 @@ RUN git clone --mirror --progress git://gcc.gnu.org/git/gcc.git gcc.git
 
 RUN git clone --mirror --progress https://github.com/ocaml/ocaml.git ocaml.git
 
-RUN git clone -s gcc.git gcc-11.5.0 \
-        && git -C gcc-11.5.0 checkout releases/gcc-11.5.0
+RUN git clone --mirror --progress git://sourceware.org/git/glibc.git glibc.git
+
+RUN curl https://ftp.gnu.org/gnu/binutils/binutils-2.40.tar.xz -o binutils-2.40.tar.xz \
+        && tar xf binutils-2.40.tar.xz \
+        && rm binutils-2.40.tar.xz
+
+RUN curl https://ftp.gnu.org/gnu/m4/m4-1.4.19.tar.xz -o m4-1.4.19.tar.xz \
+        && tar xf m4-1.4.19.tar.xz \
+        && rm m4-1.4.19.tar.xz
+
+RUN curl https://ftp.gnu.org/gnu/bison/bison-1.875.tar.gz -o bison-1.875.tar.gz \
+        && tar xf bison-1.875.tar.gz \
+        && rm bison-1.875.tar.gz
+
+RUN curl -L https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz -o flex-2.6.4.tar.gz \
+        && tar xf flex-2.6.4.tar.gz \
+        && rm flex-2.6.4.tar.gz
+
+RUN git clone -s glibc.git glibc-2.24 \
+        && git -C glibc-2.24 checkout glibc-2.24
+
+RUN git clone -s gcc.git gcc-4.7.4 \
+        && git -C gcc-4.7.4 checkout releases/gcc-4.7.4
+
+RUN git clone -s gcc.git gcc-10.5.0 \
+        && git -C gcc-10.5.0 checkout releases/gcc-10.5.0
 
 RUN curl -L https://github.com/libffi/libffi/releases/download/v3.4.8/libffi-3.4.8.tar.gz -o libffi-3.4.8.tar.gz \
         && tar xf libffi-3.4.8.tar.gz \
@@ -38,7 +62,7 @@ RUN curl https://ftp.gnu.org/gnu/guile/guile-3.0.10.tar.xz -o guile-3.0.10.tar.x
         && tar xf guile-3.0.10.tar.xz \
         && rm guile-3.0.10.tar.xz
 
-RUN git clone --progress git://sourceware.org/git/glibc.git glibc-2.33 \
+RUN git clone -s glibc.git glibc-2.33 \
         # Check out the latest version of glibc that doesn't have a variable SIGSTKSZ
         # We won't actually compile this, we'll just use the headers it provides.
         # This is about as hacky as it gets :P

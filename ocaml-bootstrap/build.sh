@@ -22,7 +22,7 @@ if [[ ! -e "/build.sh" ]]; then
     mkdir -p "$DEPENDENCIES/"{dev,tmp,usr/lib,usr/bin,usr/lib64}
 
     # Menial task automation. We don't need to replace these.
-    cp /bin/{bash,ls,make,nproc,rm,find,xargs,touch,cp,sh,sed,mkdir,cat,uname,head,grep,tr,sort,uniq,chmod,expr,ln,awk,mv,ar,env,date,rmdir,egrep,diff,sleep,cmp,ranlib,strip,file,arch,hostname,dirname,basename,true,gzip,tar,cut,patch,wc,tail} \
+    cp /bin/{bash,ls,make,nproc,rm,find,xargs,touch,cp,sh,sed,mkdir,cat,uname,head,grep,tr,sort,uniq,chmod,expr,ln,awk,mv,env,date,rmdir,egrep,diff,sleep,cmp,strip,file,arch,hostname,dirname,basename,true,gzip,tar,cut,patch,wc,tail} \
         "$DEPENDENCIES/usr/bin/"
 
     # Link "$DEPENDENCIES/bin" to "$DEPENDENCIES/usr/bin" - not the real /usr/bin
@@ -38,7 +38,7 @@ if [[ ! -e "/build.sh" ]]; then
     ln -s "usr/lib64" "$DEPENDENCIES/lib64"
 
     # We definitely need to replace these.
-    cp /bin/{gcc,g++,flex,m4,as,nm,objcopy,objdump,readelf,ld} "$DEPENDENCIES/bin"
+    cp /bin/{tcc,ar} "$DEPENDENCIES/bin"
 
     cp "$0" "$DEPENDENCIES" # Workaround for bind mount in devcontainer
 
@@ -53,14 +53,102 @@ fi
 
 set -euo pipefail
 
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/lib/gcc/x86_64-linux-gnu/12"
+export PATH="/usr/local/bin:/usr/bin"
+# Some older versions of GCC don't look here by default.
+export CPATH="/usr/include/x86_64-linux-gnu"
+export LIBRARY_PATH="/usr/local/lib:/usr/lib/x86_64-linux-gnu"
+export LD_LIBRARY_PATH="/usr/local/lib:/usr/lib/x86_64-linux-gnu"
 
-cd /gcc-11.5.0
+# Until we have a functional GCC installation, we need to provide extra hints to
+# configure/Makefile scripts on how to use tcc.
+export CC=tcc
+
+
+cd /binutils-2.40
+
+# Missing MAKEINFO causes the build to fail - but we don't want to build the
+# docs! Substitute it with true so the build continues
+./configure --disable-gprofng
+make -j$(nproc) MAKEINFO=true 
+make MAKEINFO=true install
+
+
+cd /m4-1.4.19
+
+./configure
+make -j$(nproc)
+make install
+
+
+# Bison is required to generate the GCC parser as we are building from source
+# control, which doesn't include any generated text files (unlike the release
+# tarballs).
+cd /bison-1.875
+
+./configure --disable-nls
+make -j$(nproc)
+make install
+
+
+cd /flex-2.6.4
+
+CFLAGS="-D_REGEX_NELTS(n)=" CC_FOR_BUILD=tcc ./configure
+# CFLAGS doesn't need shell escaping above, but it does in Make.
+make -j$(nproc) CFLAGS="-D'_REGEX_NELTS(n)='"
+make install
+
+
+# GCC 4.7.4 -the last version of GCC to be implemented entirely in C
+# (and therefore able to be built by tcc). Later versions of GCC require a C++
+# compiler to be built, which we will first build here.
+cd /gcc-4.7.4
+
+# First build only a C compiler, as compiling libstdc++ with a tcc-compiled
+# gcc-compiled cc1plus hangs when compiling fundamental_type_info.cc.
+# Doing an extra bootstrap cycle for the GCC C compiler seems to fix this.
+mkdir objdir-c-only
+cd objdir-c-only
+
+# Use some older header files that this version of GCC wants.
+# It's easier to just substitute the header file than to try and cherry-pick the
+# patch that fixes it - of course, assuming the header declarations are binary
+# compatible with the system libraries.
+# See https://gcc.gnu.org/legacy-ml/gcc-patches/2017-06/msg02032.html
+mv /usr/include/x86_64-linux-gnu/sys/ucontext.h /usr/include/x86_64-linux-gnu/sys/ucontext.h.old
+cp /glibc-2.24/sysdeps/unix/sysv/linux/x86/sys/ucontext.h /usr/include/x86_64-linux-gnu/sys/ucontext.h
+
+../configure --disable-multilib --enable-languages=c --enable-build-poststage1-with-cxx=no
+
+make -j$(nproc) bootstrap
+make install
+
+# We have a GCC installation now.
+unset CC
+
+cd /gcc-4.7.4
+mkdir objdir-c-cpp
+cd objdir-c-cpp
+
+../configure --disable-multilib --enable-languages=c,c++
+
+make -j$(nproc) bootstrap
+make install
+
+# Remove old header files.
+rm /usr/include/x86_64-linux-gnu/sys/ucontext.h
+mv /usr/include/x86_64-linux-gnu/sys/ucontext.h.old /usr/include/x86_64-linux-gnu/sys/ucontext.h
+
+
+# Thanks to https://github.com/fosslinux/live-bootstrap for determining which
+# version of GCC could be built with GCC 4.7.4.
+# This version of GCC is sufficiently modern to compile the OCaml 5.3.0
+# codebase, and is also old enough to not trigger some warnings (that fail the
+# build process) in the older OCaml codebase. Stop bootstrapping GCC here.
+cd /gcc-10.5.0
 mkdir objdir
 cd objdir
 
-echo "experimental" > ../gcc/DEV-PHASE
-../configure --disable-multilib --enable-languages=c
+../configure --disable-multilib --enable-languages=c,c++
 
 make -j$(nproc) bootstrap
 make install
@@ -96,7 +184,7 @@ touch doc/ref/hierarchy.png
 touch doc/ref/gds.pdf
 touch doc/ref/scheme.pdf
 
-# *_CFLAGS must be non-empty to skip pkg-config
+# *_CFLAGS must be non-empty to skip pkg-config, which we don't have.
 LIBFFI_CFLAGS=" " LIBFFI_LIBS="-lffi" \
     BDW_GC_CFLAGS=" " BDW_GC_LIBS="-lgc -lpthread -ldl" \
     ./configure
@@ -106,19 +194,15 @@ make install
 
 cd /ocamlboot
 
-# Temporarily use old SIGSTKSZ. This doesn't affect the generated binary at
-# runtime.
+# Temporarily use old SIGSTKSZ.
 # See https://github.com/ocaml/ocaml/commit/632563b19ca72ec0ae10c7ed767a025c342d3155
-# for why this is required. We can't just cherry-pick the commit as there are
-# several conflicts, so it's easier to just reproduce the older glibc
-# environment seeing as the change is header-only.
+# for why this is required.
 mv /usr/include/signal.h /usr/include/signal.h.old
 cp /glibc-2.33/signal/signal.h /usr/include/signal.h
 
 make -j$(nproc) _boot/ocamlc
 make -j$(nproc) fullboot
 
-# Undo our stupidity.
 rm /usr/include/signal.h
 mv /usr/include/signal.h.old /usr/include/signal.h
 
@@ -909,7 +993,8 @@ make -j$(nproc) bootstrap
 make INSTALL='/ocaml-5.3.0/build-aux/install-sh -c' install
 
 cd /
-echo
 
 ocamlc hello_world.ml -o hello_world
+
+echo
 ./hello_world
