@@ -114,8 +114,8 @@ mainstart:
     rem 50 : ^=
     rem 51 : |=
     rem 52 : ,
-    rem 53 : string -- note: \x and L"" are unused in tinycc -- todo
-    rem 54 : char ('X') -- todo
+    rem 53 : string -- note: \x and L"" are unused in tinycc
+    rem 54 : char ('X')
     rem 60 : keyword
     rem The following tokens are not used in tinycc, so they will not be
     rem implemented
@@ -429,8 +429,42 @@ lexer:
                 endif
                 gosub nextchar
             wend
+
             temporary_token.value_str = current_string
             temporary_token.tok_type = 53
+            gosub newtok
+        elseif (chr(current_char) = "'") then  rem chars
+            gosub init_temp_token
+            gosub nextchar
+
+            if chr(current_char) = "\" then
+                gosub nextchar
+
+                if chr(current_char) = "\" then
+                    temporary_token.value_str = "\"
+                elseif chr(current_char) = "n" then
+                    temporary_token.value_str = !"\n"
+                elseif chr(current_char) = "t" then
+                    temporary_token.value_str = !"\t"
+                elseif chr(current_char) = "0" then
+                    temporary_token.value_str = chr(0)
+                elseif chr(current_char) = !"\"" then
+                    temporary_token.value_str = !"\""
+                elseif chr(current_char) = "'" then
+                    temporary_token.value_str = "'"
+                endif
+            else
+                temporary_token.value_str = chr(current_char)
+            endif
+
+            gosub nextchar
+
+            if chr(current_char) <> "'" then
+                errmsg = !"Expected \"'\" to close the char literal"
+                goto exception
+            endif
+
+            temporary_token.tok_type = 54
             gosub newtok
         elseif current_char <> 0 then
             rem any other character
