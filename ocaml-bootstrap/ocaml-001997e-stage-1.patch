@@ -1,0 +1,72 @@
+diff --git a/bytecomp/emitcode.ml b/bytecomp/emitcode.ml
+index ea423e50b7..1b8b7fc710 100644
+--- a/bytecomp/emitcode.ml
++++ b/bytecomp/emitcode.ml
+@@ -300,10 +300,10 @@ let emit_instr = function
+   | Kgetpubmet tag -> out opGETPUBMET; out_int tag; out_int 0
+   | Kgetdynmet -> out opGETDYNMET
+   | Kevent ev -> record_event ev
+-  | Kperform -> out opPERFORM
+-  | Kresume -> out opRESUME
+-  | Kresumeterm n -> out opRESUMETERM; out_int n
+-  | Kreperformterm n -> out opREPERFORMTERM; out_int n
++  | Kperform -> out 149
++  | Kresume -> out 150
++  | Kresumeterm n -> out 151; out_int n
++  | Kreperformterm n -> out 152; out_int n
+   | Kstop -> out opSTOP
+ 
+ (* Emission of a list of instructions. Include some peephole optimization. *)
+diff --git a/lambda/matching.ml b/lambda/matching.ml
+index 43bccf6e2c..7daf17f0b5 100644
+--- a/lambda/matching.ml
++++ b/lambda/matching.ml
+@@ -1917,8 +1917,9 @@ let inline_lazy_force_cond arg loc =
+                   (* ... if tag == Obj.lazy_tag || tag == Obj.forcing_tag then
+                          Lazy.force varg
+                        else ... *)
+-                  Lprim (Psequor,
+-                       [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc),
++                  (* Lprim (Psequor,
++                       [test_tag Obj.lazy_tag; test_tag Obj.forcing_tag], loc), *)
++                  (test_tag Obj.lazy_tag),
+                   Lapply
+                     { ap_tailcall = Default_tailcall;
+                       ap_loc = loc;
+@@ -1962,7 +1963,7 @@ let inline_lazy_force_switch arg loc =
+                           ap_specialised = Default_specialise
+                         } );
+ 
+-                    (Obj.forcing_tag,
++                    (* (Obj.forcing_tag,
+                       Lapply
+                         { ap_tailcall = Default_tailcall;
+                           ap_loc = loc;
+@@ -1970,7 +1971,7 @@ let inline_lazy_force_switch arg loc =
+                           ap_args = [ varg ];
+                           ap_inlined = Default_inline;
+                           ap_specialised = Default_specialise
+-                        } )
++                        } ) *)
+                   ];
+                 sw_failaction = Some varg
+               },
+diff --git a/tools/dumpobj.ml b/tools/dumpobj.ml
+index 7c7ee74fbf..23dbca8721 100644
+--- a/tools/dumpobj.ml
++++ b/tools/dumpobj.ml
+@@ -395,10 +395,10 @@ let op_shapes = [
+   opUGEINT, Nothing;
+   opBULTINT, Uint_Disp;
+   opBUGEINT, Uint_Disp;
+-  opPERFORM, Nothing;
+-  opRESUME, Nothing;
+-  opRESUMETERM, Uint;
+-  opREPERFORMTERM, Uint;
++  149, Nothing;
++  150, Nothing;
++  151, Uint;
++  152, Uint;
+   opSTOP, Nothing;
+   opEVENT, Nothing;
+   opBREAK, Nothing;

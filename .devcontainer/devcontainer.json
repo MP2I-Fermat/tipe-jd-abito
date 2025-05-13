@@ -1,0 +1,15 @@
+{
+    "name": "OCaml bootstrap",
+    "build": {
+        "dockerfile": "../ocaml-bootstrap/Dockerfile"
+    },
+    // The Dockerfile builds into /root/bootstrap/sources, but the build script
+    // outputs to /root/bootstrap/merged.
+    "workspaceFolder": "/root/bootstrap",
+    "mounts": [
+        // Save changes made to concrete files in the container to the local filesystem.
+        "source=${localWorkspaceFolder}/ocaml-bootstrap/build.sh,target=/root/bootstrap/sources/build.sh,type=bind",
+        "source=${localWorkspaceFolder}/ocaml-bootstrap/Dockerfile,target=/root/bootstrap/sources/Dockerfile,type=bind"
+    ],
+    "privileged": true
+}

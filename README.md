@@ -53,3 +53,5 @@ Langage: OCaml.
 
 Cet émulateur permet d’émuler un CPU RISC-V. Notamment, il permettrait
 d'executer notre interpréteur BASIC et de fermer la boucle!
+
+https://stackoverflow.com/questions/9429491/how-are-gcc-and-g-bootstrapped/65708958#65708958
