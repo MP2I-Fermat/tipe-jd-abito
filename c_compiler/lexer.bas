@@ -60,105 +60,132 @@ rem auto
 rem _Complex
 rem _Imaginary
 
-mainstart:
-    rem === TOKEN TYPES ===
-    rem  0 : [undefined]
-    rem  1 : integer
-    rem  1 : hex
-    rem  5 : float
-    rem  6 : identifier
-    rem 60 : keyword
-    rem  7 : [
-    rem  8 : ]
-    rem  9 : (
-    rem 10 : )
-    rem 11 : {
-    rem 12 : }
-    rem 13 : .
-    rem 14 : ->
-    rem 15 : ++
-    rem 16 : --
-    rem 17 : &
-    rem 18 : *
-    rem 19 : +
-    rem 20 : -
-    rem 21 : ~
-    rem 22 : !
-    rem 23 : /
-    rem 24 : %
-    rem 25 : <<
-    rem 26 : >>
-    rem 27 : <
-    rem 28 : >
-    rem 29 : <=
-    rem 30 : >=
-    rem 31 : ==
-    rem 32 : !=
-    rem 33 : ^
-    rem 34 : |
-    rem 35 : &&
-    rem 36 : ||
-    rem 37 : ?
-    rem 38 : :
-    rem 39 : ;
-    rem 40 : ...
-    rem 41 : =
-    rem 42 : *=
-    rem 43 : /=
-    rem 44 : %=
-    rem 45 : +=
-    rem 46 : -=
-    rem 47 : <<=
-    rem 48 : >>=
-    rem 49 : &=
-    rem 50 : ^=
-    rem 51 : |=
-    rem 52 : ,
-    rem 53 : string -- note: \x and L"" are unused in tinycc
-    rem 54 : char ('X')
-    rem 60 : keyword
-    rem The following tokens are not used in tinycc, so they will not be
-    rem implemented
-    rem  1 : oct (will not be implemented)
-    rem  1 : bin (will not be implemented)
-    rem  7 : <:  (will not be implemented)
-    rem  8 : :>  (will not be implemented)
-    rem 11 : <%  (will not be implemented)
-    rem 12 : %>  (will not be implemented)
-    rem ===================
-    type token
-        value_str as string
-        value_int as longint
-        value_float as double
-        tok_type as integer
-        pos_start as integer
-        pos_end as integer
-    end type
+rem === TOKEN TYPES ===
+const TOK_UNDEFINED = 0       rem [undefined]
+const TOK_INTEGER = 1         rem integer
+const TOK_HEX = 1             rem hex
+const TOK_FLOAT = 5           rem float
+rem note: the 'f', 'F', 'l' and 'L' suffixes ARE USED by TCC
+rem note: there is no hexadecimal-floating-constant in TCC
+const TOK_IDENTIFIER = 6      rem identifier
+rem   TOK_KEYWORD    = 60     rem defined at the end of the list
+const TOK_LSQUARE = 7         rem [
+const TOK_RSQUARE = 8         rem ]
+const TOK_LPAREN  = 9         rem (
+const TOK_RPAREN  = 10        rem )
+const TOK_LBRACKET = 11       rem {
+const TOK_RBRACKET = 12       rem {
+const TOK_DOT = 13            rem .
+const TOK_ARROW = 14          rem ->
+const TOK_PLUSPLUS = 15       rem ++
+const TOK_MINUSMINUS = 16     rem --
+const TOK_AMP = 17            rem &
+const TOK_MULT = 18           rem *
+const TOK_PLUS = 19           rem +
+const TOK_MINUS = 20          rem -
+const TOK_BITWISENOT = 21     rem ~
+const TOK_BANG = 22           rem !
+const TOK_SLASH = 23          rem /
+const TOK_PERCENT = 24        rem %
+const TOK_LSHIFT = 25         rem <<
+const TOK_RSHIFT = 26         rem >>
+const TOK_LT = 27             rem <
+const TOK_GT = 28             rem >
+const TOK_LTE = 29            rem <=
+const TOK_GTE = 30            rem >=
+const TOK_EEQ = 31            rem ==
+const TOK_NEQ = 32            rem !=
+const TOK_BITWISEXOR = 33    rem ^
+const TOK_BITWISEOR = 34     rem |
+const TOK_AND = 35            rem &&
+const TOK_OR = 36             rem ||
+const TOK_INTERROGATION = 37  rem ?
+const TOK_COLON = 38          rem :
+const TOK_SEMICOLON = 39      rem ;
+const TOK_ELLIPSIS = 40       rem ...
+const TOK_EQ_ASSIGN = 41      rem =
+const TOK_MULTEQ = 42         rem *=
+const TOK_DIVEQ = 43          rem /=
+const TOK_PERCENTEQ = 44      rem %=
+const TOK_PLUSEQ = 45         rem +=
+const TOK_MINUSEQ = 46        rem -=
+const TOK_LSHIFTEQ = 47       rem <<=
+const TOK_RSHIFTEQ = 48       rem >>=
+const TOK_AMPEQ = 49          rem &=
+const TOK_BITWISEXOREQ = 50  rem ^=
+const TOK_BITWISEOREQ = 51    rem |=
+const TOK_COMMA = 52          rem ,
+const TOK_STRING = 53         rem string -- note: \x and L"" are unused in tinycc
+const TOK_CHAR = 54           rem char ('X') -- note: u'', U'' and L'' are unused in tinycc
+const TOK_KEYWORD = 60        rem keyword
+rem The following tokens are not used in tinycc, so they will not be
+rem implemented
+rem  1 : oct (will not be implemented)
+rem  1 : bin (will not be implemented)
+rem  7 : <:  (will not be implemented)
+rem  8 : :>  (will not be implemented)
+rem 11 : <%  (will not be implemented)
+rem 12 : %>  (will not be implemented)
+rem ===================
 
-    dim f as integer
-    dim current_char as ubyte
-    dim index as long
-    dim start_index as long
-    dim errmsg as string
+const NO_VALUE = 128
 
-    dim temporary_token as token
-    redim tokens(0 to 32) as token
-    dim tok_index = 0
+const C_BYTE = 0
+const C_SHORT = 1
+const C_INT = 2
+const C_LONG = 3
+const C_LONGLONG = 4
 
-    dim beginning_of_line = true
-    dim do_not_advance = false
+type c_integer_type
+    value as longint
+    value_type as uinteger
+    is_unsigned as boolean
+end type
 
-    dim encountered_escape_seq_character = false
+const C_SINGLE = 0
+const C_DOUBLE = 1
 
-    f = freefile
+type c_float_type
+    value_type as uinteger
+    union
+        c_float as single
+        c_double as double
+    end union
+end type
 
-    open "test.c" for binary as #f
-    if err > 0 then print "Error opening the file. Error code:"; err : end
+type token
+    value_str as string
+    value_int as c_integer_type
+    value_float as c_float_type
+    tok_type as uinteger
+    pos_start as integer
+    pos_end as integer
+end type
 
-    index = -1
+dim f as integer
+dim current_char as ubyte
+dim index as long
+dim start_index as long
+dim errmsg as string
 
-    gosub lexer
-    goto mainend
+dim temporary_token as token
+redim tokens(0 to 32) as token
+dim tok_index = 0
+
+dim beginning_of_line = true
+dim do_not_advance = false
+
+dim encountered_escape_seq_character = false
+
+f = freefile
+
+open "test.c" for binary as #f
+if err > 0 then print "Error opening the file. Error code:"; err : end
+
+index = -1
+
+gosub lexer
+goto mainend
 
 
 rem Sub lexer
@@ -195,47 +222,47 @@ lexer:
             gosub skip_preprocessor_output
         elseif (chr(current_char) = "[") then
             gosub init_temp_token
-            temporary_token.tok_type = 7
+            temporary_token.tok_type = TOK_LSQUARE
             gosub newtok
         elseif (chr(current_char) = "]") then
             gosub init_temp_token
-            temporary_token.tok_type = 8
+            temporary_token.tok_type = TOK_LSQUARE
             gosub newtok
         elseif (chr(current_char) = "(") then
             gosub init_temp_token
-            temporary_token.tok_type = 9
+            temporary_token.tok_type = TOK_LPAREN
             gosub newtok
         elseif (chr(current_char) = ")") then
             gosub init_temp_token
-            temporary_token.tok_type = 10
+            temporary_token.tok_type = TOK_RPAREN
             gosub newtok
         elseif (chr(current_char) = "{") then
             gosub init_temp_token
-            temporary_token.tok_type = 11
+            temporary_token.tok_type = TOK_LBRACKET
             gosub newtok
         elseif (chr(current_char) = "}") then
             gosub init_temp_token
-            temporary_token.tok_type = 12
+            temporary_token.tok_type = TOK_RBRACKET
             gosub newtok
         elseif (chr(current_char) = "~") then
             gosub init_temp_token
-            temporary_token.tok_type = 21
+            temporary_token.tok_type = TOK_BITWISENOT
             gosub newtok
         elseif (chr(current_char) = "?") then
             gosub init_temp_token
-            temporary_token.tok_type = 37
+            temporary_token.tok_type = TOK_INTERROGATION
             gosub newtok
         elseif (chr(current_char) = ":") then
             gosub init_temp_token
-            temporary_token.tok_type = 38
+            temporary_token.tok_type = TOK_COLON
             gosub newtok
         elseif (chr(current_char) = ";") then
             gosub init_temp_token
-            temporary_token.tok_type = 39
+            temporary_token.tok_type = TOK_SEMICOLON
             gosub newtok
         elseif (chr(current_char) = ",") then
             gosub init_temp_token
-            temporary_token.tok_type = 52
+            temporary_token.tok_type = TOK_COMMA
             gosub newtok
         elseif (chr(current_char) = ".") then
             gosub init_temp_token
@@ -246,23 +273,23 @@ lexer:
                     errmsg = "Expected '.' after '..'"
                     goto exception
                 endif
-                temporary_token.tok_type = 40
+                temporary_token.tok_type = TOK_ELLIPSIS
             else  rem .
                 do_not_advance = true
-                temporary_token.tok_type = 13
+                temporary_token.tok_type = TOK_DOT
             endif
             gosub newtok
         elseif (chr(current_char) = "-") then
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = ">") then  rem ->
-                temporary_token.tok_type = 14
+                temporary_token.tok_type = TOK_ARROW
             elseif (chr(current_char) = "-") then  rem --
-                temporary_token.tok_type = 16
+                temporary_token.tok_type = TOK_MINUSMINUS
             elseif (chr(current_char) = "=") then  rem -=
-                temporary_token.tok_type = 46
+                temporary_token.tok_type = TOK_MINUSEQ
             else  rem -
-                temporary_token.tok_type = 20
+                temporary_token.tok_type = TOK_MINUS
                 do_not_advance = true
             endif
             gosub newtok
@@ -270,11 +297,11 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "+") then  rem ++
-                temporary_token.tok_type = 15
+                temporary_token.tok_type = TOK_PLUSPLUS
             elseif (chr(current_char) = "=") then  rem +=
-                temporary_token.tok_type = 45
+                temporary_token.tok_type = TOK_PLUSEQ
             else  rem +
-                temporary_token.tok_type = 19
+                temporary_token.tok_type = TOK_PLUS
                 do_not_advance = true
             endif
             gosub newtok
@@ -282,11 +309,11 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "&") then  rem &&
-                temporary_token.tok_type = 35
+                temporary_token.tok_type = TOK_AND
             elseif (chr(current_char) = "=") then  rem &=
-                temporary_token.tok_type = 49
+                temporary_token.tok_type = TOK_AMPEQ
             else  rem &
-                temporary_token.tok_type = 17
+                temporary_token.tok_type = TOK_AMP
                 do_not_advance = true
             endif
             gosub newtok
@@ -294,9 +321,9 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem *=
-                temporary_token.tok_type = 42
+                temporary_token.tok_type = TOK_MULTEQ
             else  rem *
-                temporary_token.tok_type = 18
+                temporary_token.tok_type = TOK_MULT
                 do_not_advance = true
             endif
             gosub newtok
@@ -304,9 +331,9 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem !=
-                temporary_token.tok_type = 32
+                temporary_token.tok_type = TOK_NEQ
             else  rem !
-                temporary_token.tok_type = 22
+                temporary_token.tok_type = TOK_BANG
                 do_not_advance = true
             endif
             gosub newtok
@@ -314,9 +341,9 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem /=
-                temporary_token.tok_type = 43
+                temporary_token.tok_type = TOK_DIVEQ
             else  rem /
-                temporary_token.tok_type = 23
+                temporary_token.tok_type = TOK_SLASH
                 do_not_advance = true
             endif
             gosub newtok
@@ -324,9 +351,9 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem %=
-                temporary_token.tok_type = 44
+                temporary_token.tok_type = TOK_PERCENTEQ
             else  rem %
-                temporary_token.tok_type = 24
+                temporary_token.tok_type = TOK_PERCENT
                 do_not_advance = true
             endif
             gosub newtok
@@ -336,15 +363,15 @@ lexer:
             if (chr(current_char) = "<") then  rem <<
                 gosub nextchar
                 if (chr(current_char) = "=") then  rem <<=
-                    temporary_token.tok_type = 47
+                    temporary_token.tok_type = TOK_LSHIFTEQ
                 else  rem <<
-                    temporary_token.tok_type = 25
+                    temporary_token.tok_type = TOK_LSHIFT
                     do_not_advance = true
                 endif
             elseif (chr(current_char) = "=") then  rem <=
-                temporary_token.tok_type = 29
+                temporary_token.tok_type = TOK_LTE
             else  rem <
-                temporary_token.tok_type = 27
+                temporary_token.tok_type = TOK_LT
                 do_not_advance = true
             endif
             gosub newtok
@@ -354,15 +381,15 @@ lexer:
             if (chr(current_char) = ">") then  rem >>
                 gosub nextchar
                 if (chr(current_char) = "=") then  rem >>=
-                    temporary_token.tok_type = 48
+                    temporary_token.tok_type = TOK_RSHIFTEQ
                 else  rem >>
-                    temporary_token.tok_type = 26
+                    temporary_token.tok_type = TOK_RSHIFT
                     do_not_advance = true
                 endif
             elseif (chr(current_char) = "=") then  rem >=
-                temporary_token.tok_type = 30
+                temporary_token.tok_type = TOK_GTE
             else  rem >
-                temporary_token.tok_type = 28
+                temporary_token.tok_type = TOK_GT
                 do_not_advance = true
             endif
             gosub newtok
@@ -370,9 +397,9 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem ==
-                temporary_token.tok_type = 31
+                temporary_token.tok_type = TOK_EEQ
             else  rem =
-                temporary_token.tok_type = 41
+                temporary_token.tok_type = TOK_EQ_ASSIGN
                 do_not_advance = true
             endif
             gosub newtok
@@ -380,9 +407,9 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem ^=
-                temporary_token.tok_type = 50
+                temporary_token.tok_type = TOK_BITWISEXOREQ
             else  rem ^
-                temporary_token.tok_type = 33
+                temporary_token.tok_type = TOK_BITWISEXOR
                 do_not_advance = true
             endif
             gosub newtok
@@ -390,11 +417,11 @@ lexer:
             gosub init_temp_token
             gosub nextchar
             if (chr(current_char) = "=") then  rem |=
-                temporary_token.tok_type = 51
+                temporary_token.tok_type = TOK_BITWISEOREQ
             elseif (chr(current_char) = "|") then  rem ||
-                temporary_token.tok_type = 36
+                temporary_token.tok_type = TOK_OR
             else  rem |
-                temporary_token.tok_type = 34
+                temporary_token.tok_type = TOK_BITWISEOR
                 do_not_advance = true
             endif
             gosub newtok
@@ -431,7 +458,7 @@ lexer:
             wend
 
             temporary_token.value_str = current_string
-            temporary_token.tok_type = 53
+            temporary_token.tok_type = TOK_STRING
             gosub newtok
         elseif (chr(current_char) = "'") then  rem chars
             gosub init_temp_token
@@ -464,7 +491,7 @@ lexer:
                 goto exception
             endif
 
-            temporary_token.tok_type = 54
+            temporary_token.tok_type = TOK_CHAR
             gosub newtok
         elseif current_char <> 0 then
             rem any other character
@@ -489,8 +516,8 @@ rem (0s everywhere (except pos_start and pos_end, which are initialised with
 rem `index`))
 init_temp_token:
     temporary_token.value_str = ""
-    temporary_token.value_float = 0.0
-    temporary_token.value_int = 0
+    temporary_token.value_float.value_type = NO_VALUE
+    temporary_token.value_int.value_type = NO_VALUE
     temporary_token.pos_start = index
     temporary_token.pos_end = index
     temporary_token.tok_type = 0
@@ -512,12 +539,32 @@ rem Sub print_token
 rem prints the token stored in temporary_token in a pretty way ; used for
 rem debugging
 print_token:
-    print !"\""; temporary_token.value_str; !"\"\t\t";
-    print temporary_token.value_int; !"\t";
-    print temporary_token.value_float; !"\t";
     print temporary_token.tok_type; !"\t";
     print temporary_token.pos_start; !"\t";
-    print temporary_token.pos_end
+    print temporary_token.pos_end; !"\t";
+
+    if temporary_token.tok_type = TOK_STRING or _
+       temporary_token.tok_type = TOK_CHAR then
+        print !"\""; temporary_token.value_str; !"\"";
+
+    elseif temporary_token.tok_type = TOK_IDENTIFIER or _
+           temporary_token.tok_type = TOK_KEYWORD then
+        print temporary_token.value_str;
+
+    elseif temporary_token.value_int.value_type <> NO_VALUE then
+        print temporary_token.value_int.value; ", type: ";
+        print temporary_token.value_int.value_type; ", is_unsigned: ";
+        print temporary_token.value_int.is_unsigned;
+
+    elseif temporary_token.value_float.value_type <> NO_VALUE then
+        if temporary_token.value_float.value_type = C_SINGLE then
+            print temporary_token.value_float.c_float; !"(single)";
+        else
+            print temporary_token.value_float.c_double; !"(double)";
+        endif
+    endif
+
+    print ""
 
     return
 
@@ -590,11 +637,14 @@ make_num:
     temporary_token.pos_start = start_index
     temporary_token.pos_end = index
     if is_float then
-        temporary_token.tok_type = 5
-        temporary_token.value_float = current_float
+        temporary_token.tok_type = TOK_FLOAT
+        temporary_token.value_float.value_type = C_DOUBLE
+        temporary_token.value_float.c_double = current_float
     else
-        temporary_token.tok_type = 1
-        temporary_token.value_int = current_num
+        temporary_token.tok_type = TOK_INTEGER
+        temporary_token.value_int.value_type = C_LONGLONG
+        temporary_token.value_int.value = current_num
+        temporary_token.value_int.is_unsigned = false
     endif
     gosub newtok
     do_not_advance = true
@@ -621,10 +671,10 @@ make_id:
     temporary_token.pos_start = start_index
     temporary_token.pos_end = index
 
-    temporary_token.tok_type = 6
+    temporary_token.tok_type = TOK_IDENTIFIER
     for i1 as integer = lbound(C_99_KEYWORDS) to ubound(C_99_KEYWORDS)
         if current_id = C_99_KEYWORDS(i1) then
-            temporary_token.tok_type = 60
+            temporary_token.tok_type = TOK_KEYWORD
             exit for
         endif
     next
@@ -651,7 +701,7 @@ rem Closes the source file, prints tokens and ends the program.
 mainend:
     close #f
     print !"\nTokens :"
-    print !"str\t\t int\t float\t type\t start\t end"
+    print !"type\t start\t end"
     for i as integer = lbound(tokens) to tok_index-1
         temporary_token = tokens(i)
         gosub print_token
