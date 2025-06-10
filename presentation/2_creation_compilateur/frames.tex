@@ -1,0 +1,152 @@
+
+\begin{frame}[fragile]
+    \frametitle{Création d’un compilateur}
+    Fonctionnement d’un compilateur \pause
+    \begin{enumerate}
+        \item<2-6> Analyseur lexical
+        \item<3-6> Analyseur syntaxique
+        \item<4-5> Compilation
+        \item<5> Édition de liens
+    \end{enumerate}
+\end{frame}
+
+\newsavebox{\chelloworld}
+\begin{lrbox}{\chelloworld}
+\begin{lstlisting}[language=c, basicstyle=\footnotesize]
+int main() {
+    printf("Hello, world!");
+    return 0;
+}
+\end{lstlisting}
+\end{lrbox}
+
+\begin{frame}[fragile]
+    \frametitle{Principe du compilateur}
+
+    \begin{center}
+    \begin{tikzpicture}[node distance=5mm and 5mm]
+        \node (fichier) [draw, rectangle] {\usebox\chelloworld};
+        \node (compilateur) [draw, rounded rectangle, right=of fichier] {Complilateur};
+        \node (binaire) [draw, rectangle, right=of compilateur] {Binaire};
+
+        \path (fichier) edge[->] (compilateur);
+        \path (compilateur) edge[->] (binaire);
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Arbre de syntaxe}
+
+    \(3\times6 + 5\times3\)
+
+    \pause
+
+    \begin{center}
+    \begin{tikzpicture}[
+        level distance=10mm,
+        level 1/.style={sibling distance=20mm},
+        level 2/.style={sibling distance=10mm},
+    ]
+        \node [draw, rectangle] {+}
+            child {node [draw, rectangle] {$\times$}
+                child {node [draw, circle] {3}}
+                child {node [draw, circle] {6}}
+            }
+            child {node [draw, rectangle] {$\times$}
+                child {node [draw, circle] {5}}
+                child {node [draw, circle] {3}}
+            };
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Analyseur lexical}
+
+    {\usebox\chelloworld}
+
+    \pause
+    \vspace{2em}
+
+    \begin{tikzpicture}[
+        every node/.style={draw, rectangle},
+        node distance=1mm and 1mm
+    ]
+        \node (int) {\verb|int|};
+        \node (main) [right=of int] {\verb|main|};
+        \node (lparen1) [right=of main] {\verb|(|};
+        \node (rparen1) [right=of lparen1] {\verb|)|};
+        \node (lbracket) [right=of rparen1] {\verb|{|};
+        \node (printf) [right=of lbracket] {\verb|printf|};
+        \node (lparen2) [right=of printf] {\verb|(|};
+        \node (string) [right=of lparen2] {\verb|"Hello, world!"|};
+        \node (rparen2) [right=of string] {\verb|)|};
+        \node (semicolon1) [right=of rparen2] {\verb|;|};
+        \node (return) [below right=of int, xshift=-9.75mm] {\verb|return|};
+        \node (zero) [right=of return] {\verb|0|};
+        \node (semicolon2) [right=of zero] {\verb|;|};
+        \node (rbracket) [right=of semicolon2] {\verb|}|};
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Analyseur lexical~: choix du plus long lexème possible}
+
+    \begin{lstlisting}[language=c]
+    var ++;
+    var += 12;
+    \end{lstlisting}
+
+    \pause
+    \vspace{2em}
+
+    On choisira~:
+    \begin{tikzpicture}[
+        every node/.style={draw, rectangle},
+        node distance=1mm and 1mm
+    ]
+        \node (variable1) {\verb|var|};
+        \node (plusplus) [right=of variable1] {\verb|++|};
+        \node (semicolon1) [right=of plusplus] {\verb|;|};
+        \node (variable2) [right=of semicolon1] {\verb|var|};
+        \node (pluseq) [right=of variable2] {\verb|+=|};
+        \node (int) [right=of pluseq] {\verb|12|};
+        \node (semicolon2) [right=of int] {\verb|;|};
+    \end{tikzpicture}
+
+    Et non~:
+    \begin{tikzpicture}[
+        every node/.style={draw, rectangle},
+        node distance=1mm and 1mm
+    ]
+        \node (variable1) {\verb|v|};
+        \node (variable2) [right=of variable1] {\verb|a|};
+        \node (variable3) [right=of variable2] {\verb|r|};
+        \node (plus1) [right=of variable3] {\verb|+|};
+        \node (plus2) [right=of plus1] {\verb|+|};
+        \node (semicolon1) [right=of plus2] {\verb|;|};
+        \node (variable4) [right=of semicolon1] {\verb|v|};
+        \node (variable5) [right=of variable4] {\verb|a|};
+        \node (variable6) [right=of variable5] {\verb|r|};
+        % \node (dots) [draw=none] {…}
+        \node (plus3) [right=of variable6] {\verb|+|};
+        \node (eq) [right=of plus3] {\verb|=|};
+        \node (int1) [right=of eq] {\verb|1|};
+        \node (int2) [right=of int1] {\verb|2|};
+        \node (semicolon2) [right=of int2] {\verb|;|};
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Analyseur lexical~: lexèmes}
+
+    Couples $(\text{type}, \text{valeur})$.
+
+    \pause
+    \vspace{2em}
+
+    Exemples~: $(\verb|int|, 12)$, $(\verb|identifier|, \verb|main|)$,
+    $(\verb|keyword|, \verb|int|)$, $(\verb|string|, \verb|"Hello, world"|)$,
+    $(\verb|plus|, +)$, …
+\end{frame}
