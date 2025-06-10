@@ -3,12 +3,13 @@
     \frametitle{Création d’un compilateur}
     Fonctionnement d’un compilateur \pause
     \begin{enumerate}
-        \item<2-6> Analyseur lexical
-        \item<3-6> Analyseur syntaxique
+        \item<2-6> Analyse lexicale
+        \item<3-6> Analyse syntaxique
         \item<4-5> Compilation
         \item<5> Édition de liens
     \end{enumerate}
 \end{frame}
+
 
 \newsavebox{\chelloworld}
 \begin{lrbox}{\chelloworld}
@@ -19,6 +20,7 @@ int main() {
 }
 \end{lstlisting}
 \end{lrbox}
+
 
 \begin{frame}[fragile]
     \frametitle{Principe du compilateur}
@@ -34,6 +36,7 @@ int main() {
     \end{tikzpicture}
     \end{center}
 \end{frame}
+
 
 \begin{frame}[fragile]
     \frametitle{Arbre de syntaxe}
@@ -61,6 +64,57 @@ int main() {
     \end{center}
 \end{frame}
 
+
+\begin{frame}[fragile]
+    \frametitle{Arbre de syntaxe}
+
+    \begin{lstlisting}[language=c]
+    printf("Hello, world!\n");
+    \end{lstlisting}
+
+    \pause
+
+    \begin{center}
+    \begin{tikzpicture}[
+        level 1/.style={sibling distance=50mm}
+    ]
+        \node [draw, rectangle] {Appel de fonction}
+            child { node [draw, rectangle] {printf} }
+            child { node [draw, rectangle] {Arguments}
+                child { node [draw, rectangle] {"Hello, world!\textbackslash{}n"} }
+            };
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Arbre de syntaxe}
+
+    \begin{lstlisting}[language=c]!
+    printf("%s\n", n+3);
+    \end{lstlisting}
+
+    \pause
+
+    \begin{center}
+    \begin{tikzpicture}[
+        level 1/.style={sibling distance=50mm}
+    ]
+        \node [draw, rectangle] {Appel de fonction}
+            child { node [draw, rectangle] {printf} }
+            child { node [draw, rectangle] {Arguments}
+                child { node [draw, rectangle] {"\%s\textbackslash{}n"} }
+                child { node [draw, rectangle] {+}
+                    child { node [draw, rectangle] {n} }
+                    child { node [draw, rectangle] {3} }
+                }
+            };
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+
 \begin{frame}[fragile]
     \frametitle{Analyseur lexical}
 
@@ -80,7 +134,7 @@ int main() {
         \node (lbracket) [right=of rparen1] {\verb|{|};
         \node (printf) [right=of lbracket] {\verb|printf|};
         \node (lparen2) [right=of printf] {\verb|(|};
-        \node (string) [right=of lparen2] {\verb|"Hello, world!"|};
+        \node (string) [right=of lparen2] {\verb|"Hello, world!\n"|};
         \node (rparen2) [right=of string] {\verb|)|};
         \node (semicolon1) [right=of rparen2] {\verb|;|};
         \node (return) [below right=of int, xshift=-9.75mm] {\verb|return|};
@@ -89,6 +143,7 @@ int main() {
         \node (rbracket) [right=of semicolon2] {\verb|}|};
     \end{tikzpicture}
 \end{frame}
+
 
 \begin{frame}[fragile]
     \frametitle{Analyseur lexical~: choix du plus long lexème possible}
@@ -138,6 +193,7 @@ int main() {
     \end{tikzpicture}
 \end{frame}
 
+
 \begin{frame}[fragile]
     \frametitle{Analyseur lexical~: lexèmes}
 
@@ -150,3 +206,142 @@ int main() {
     $(\verb|keyword|, \verb|int|)$, $(\verb|string|, \verb|"Hello, world"|)$,
     $(\verb|plus|, +)$, …
 \end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Grammaire~: exemple de la grammaire française}
+
+    \[
+    \begin{aligned}
+        \text{Phrase} &\to \text{Sujet Verbe Complément} \\
+        \pause
+        \text{Sujet} &\to \text{Groupe nominal} \\
+        \text{Sujet} &\to \text{Pronom personnel sujet} \\
+        \pause
+        \text{Complément} &\to \text{Groupe nominal} \\
+        \pause
+        \text{Groupe nominal} &\to \text{Déterminant Nom} \\
+        \pause
+        \text{Verbe} &\to v \\
+        \text{Pronom personnel sujet} &\to p_s \\
+        \text{Déterminant} &\to d \\
+        \text{Nom} &\to n \\
+    \end{aligned}
+    \]
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Grammaire~: exemple de la grammaire française}
+
+    Je mange une pomme
+
+    \pause
+
+    \[
+    \begin{aligned}
+        \text{Phrase} &\implies \text{Sujet Verbe Complément} \\
+        \pause
+                      &\implies \text{Pronom personnel sujet Verbe Complément} \\
+        \pause
+                      &\implies \text{\textit{Je} Verbe Complément} \\
+        \pause
+                      &\implies \text{\textit{Je mange} Complément} \\
+        \pause
+                      &\implies \text{\textit{Je mange} Groupe nominal} \\
+        \pause
+                      &\implies \text{\textit{Je mange} Déterminant Nom} \\
+        \pause
+                      &\implies \text{\textit{Je mange une} Nom} \\
+        \pause
+                      &\implies \text{\textit{Je mange une pomme}} \\
+    \end{aligned}
+    \]
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Grammaire~: exemple de la grammaire française}
+
+    Le chat mange la souris
+
+    \pause
+
+    \[
+    \begin{aligned}
+        \text{Phrase} &\implies \text{Sujet Verbe Complément} \\
+        \pause
+                      &\implies \text{Groupe nominal Verbe Complément} \\
+        \pause
+                      &\implies \text{Déterminant Nom Verbe Complément} \\
+        \pause
+                      &\implies \text{\textit{Le} Nom Verbe Complément} \\
+        \pause
+                      &\implies \text{\textit{Le chat} Verbe Complément} \\
+        \pause
+                      &\implies \text{\textit{Le chat mange} Complément} \\
+        \pause
+                      &\implies \text{\textit{Le chat mange} Groupe nominal} \\
+        \pause
+                      &\implies \text{\textit{Le chat mange} Déterminant Nom} \\
+        \pause
+                      &\implies \text{\textit{Le chat mange la} Nom} \\
+        \pause
+                      &\implies \text{\textit{Le chat mange la souris}} \\
+    \end{aligned}
+    \]
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Grammaire~: ambiguïtés}
+    La petite brise la glace
+
+    \pause
+
+    \begin{center}
+    \begin{tikzpicture}
+    [
+        level 1/.style={sibling distance=25mm}
+    ]
+        \node [draw, rectangle] {Phrase}
+            child { node [draw, rectangle] {Sujet}
+                child { node [draw, rectangle] {La} }
+                child { node [draw, rectangle] {petite} }
+            }
+            child { node [draw, rectangle] {Verbe}
+                child { node [draw, rectangle] {brise} }
+            }
+            child { node [draw, rectangle] {Complément}
+                child { node [draw, rectangle] {la} }
+                child { node [draw, rectangle] {glace} }
+            };
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Grammaire~: ambiguïtés}
+    La petite brise la glace
+
+    \begin{center}
+    \begin{tikzpicture}
+    [
+        level 1/.style={sibling distance=30mm},
+        level 2/.style={sibling distance=15mm}
+    ]
+        \node [draw, rectangle] {Phrase}
+            child { node [draw, rectangle] {Sujet}
+                child { node [draw, rectangle] {La} }
+                child { node [draw, rectangle] {petite} }
+                child { node [draw, rectangle] {brise} }
+            }
+            child { node [draw, rectangle] {Complément}
+                child { node [draw, rectangle] {la} }
+            }
+            child { node [draw, rectangle] {Verbe}
+                child { node [draw, rectangle] {glace} }
+            };
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
