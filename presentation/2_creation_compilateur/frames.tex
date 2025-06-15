@@ -259,38 +259,38 @@ int main() {
 
 \end{frame}
 
-\begin{frame}[fragile]
-    \frametitle{Grammaire~: exemple de la grammaire française}
-
-    Le chat mange la souris
-
-    \pause
-
-    \[
-    \begin{aligned}
-        \text{Phrase} &\implies \text{Sujet Verbe Complément} \\
-        \pause
-                      &\implies \text{Groupe nominal Verbe Complément} \\
-        \pause
-                      &\implies \text{Déterminant Nom Verbe Complément} \\
-        \pause
-                      &\implies \text{\textit{Le} Nom Verbe Complément} \\
-        \pause
-                      &\implies \text{\textit{Le chat} Verbe Complément} \\
-        \pause
-                      &\implies \text{\textit{Le chat mange} Complément} \\
-        \pause
-                      &\implies \text{\textit{Le chat mange} Groupe nominal} \\
-        \pause
-                      &\implies \text{\textit{Le chat mange} Déterminant Nom} \\
-        \pause
-                      &\implies \text{\textit{Le chat mange la} Nom} \\
-        \pause
-                      &\implies \text{\textit{Le chat mange la souris}} \\
-    \end{aligned}
-    \]
-
-\end{frame}
+%\begin{frame}[fragile]
+%    \frametitle{Grammaire~: exemple de la grammaire française}
+%
+%    Le chat mange la souris
+%
+%    \pause
+%
+%    \[
+%    \begin{aligned}
+%        \text{Phrase} &\implies \text{Sujet Verbe Complément} \\
+%        \pause
+%                      &\implies \text{Groupe nominal Verbe Complément} \\
+%        \pause
+%                      &\implies \text{Déterminant Nom Verbe Complément} \\
+%        \pause
+%                      &\implies \text{\textit{Le} Nom Verbe Complément} \\
+%        \pause
+%                      &\implies \text{\textit{Le chat} Verbe Complément} \\
+%        \pause
+%                      &\implies \text{\textit{Le chat mange} Complément} \\
+%        \pause
+%                      &\implies \text{\textit{Le chat mange} Groupe nominal} \\
+%        \pause
+%                      &\implies \text{\textit{Le chat mange} Déterminant Nom} \\
+%        \pause
+%                      &\implies \text{\textit{Le chat mange la} Nom} \\
+%        \pause
+%                      &\implies \text{\textit{Le chat mange la souris}} \\
+%    \end{aligned}
+%    \]
+%
+%\end{frame}
 
 \begin{frame}[fragile]
     \frametitle{Grammaire~: ambiguïtés}
@@ -345,3 +345,169 @@ int main() {
     \end{center}
 \end{frame}
 
+\begin{frame}[fragile]
+    \frametitle{Algorithmes d’analyse lexicale}
+
+    \begin{enumerate}
+        \item LL(1)
+        \item LR(1)
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algorithme LL(1)}
+
+    \textit{Left to right, Leftmost derivation}
+
+    Précalcul des premiers lexèmes de chaque règle
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algorithme LL(1)~: les ensembles $premier(\dots)$}
+
+    \begin{align*}
+        S &\implies +SS \\
+        S &\implies c
+    \end{align*}
+
+    \pause
+
+    \begin{align*}
+        premier(c) &= \{c\} \\
+        premier(S) &= \{+, c\}
+    \end{align*}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algorithme LL(1)}
+
+    \begin{algorithm}[H]
+        \DontPrintSemicolon
+        \Input{$\alpha$ un symbole, $texte$}
+        \Output{arbre $\times$ texte}
+
+        \Si{$texte$ est vide}{
+            Erreur\;
+        }
+        \Si{$\alpha$ est un terminal}{
+            \Si{$texte[0] = \alpha$}{
+                \Return{
+                    $\vcenter{\hbox{\begin{tikzpicture}
+                        \node[draw,rectangle]{$texte[0]$};
+                    \end{tikzpicture}}}$,
+                    $texte[1...]$
+                }\;
+            }
+            \Sinon{
+                Erreur\;
+            }
+        }
+
+
+        \caption{LL(1)}
+    \end{algorithm}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \addtocounter{algocf}{-1}
+    \frametitle{Algorithme LL(1)}
+
+    \begin{algorithm}[H]
+        \setcounter{AlgoLine}{7}
+        \DontPrintSemicolon
+        \tcc*[h]{On a $\alpha \to \overrightarrow{\beta_1}, \alpha\to\overrightarrow{\beta_2}, \dots$}
+
+        \Si{$\nexists i / texte[0] \in premier(\overrightarrow{\beta_i})$}{
+            Erreur\;
+        }
+
+        Posons $i$ tel que $texte[0] \in premier(\overrightarrow{\beta_i})$\;
+
+        $ss\_arbre_1, texte_1 \gets LL1(\overrightarrow{\beta_i}[0], texte)$\;
+        $ss\_arbre_2, texte_2 \gets LL1(\overrightarrow{\beta_i}[1], texte_1)$\;
+        etc.\;
+
+        \Return{
+            $\vcenter{\hbox{\begin{tikzpicture}[
+                level distance=10mm,
+                level 1/.style={sibling distance=20mm},
+            ]
+                \node [draw, circle] {$\alpha$}
+                    child {node[draw,rectangle]{$ss\_arbre_1$}}
+                    child {node[draw,rectangle]{$ss\_arbre_2$}}
+                    child {node {$\dots$}} ;
+            \end{tikzpicture}}}$,
+            $texte_n$
+        }\;
+
+        \caption{LL(1)}
+    \end{algorithm}
+
+    \addtocounter{framenumber}{-1}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Problème de LL(1)}
+
+    \begin{align*}
+        S &\implies I \\
+        S &\implies E \\
+        I &\implies \text{if} \dots \text{then} \dots \text{end} \\
+        E &\implies \text{if} \dots \text{then} \dots \text{else} \dots \text{end}
+    \end{align*}
+
+    \pause
+
+    \begin{align*}
+        premier(I) &= \{\text{if}\} \\
+        premier(E) &= \{\text{if}\}
+    \end{align*}
+
+    Ici, $premier(I) \cap premier(E) \ne \varnothing$~: la grammaire n’est
+    \textbf{pas LL(1)}~!
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{LR(1)}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{C n’est ni LL ni LR…}
+
+    \begin{center}
+    \verb|x * y;|
+    \end{center}
+
+    \pause
+    \vspace{1em}
+
+    \begin{center}
+    \begin{tikzpicture}[
+        level distance=10mm,
+        level 1/.style={sibling distance=20mm}
+    ]
+        \node [draw, rectangle] {*}
+            child {node[draw,rectangle]{x}}
+            child {node[draw,rectangle]{y}} ;
+    \end{tikzpicture}
+    \end{center}
+
+    \pause
+    \vspace{1em}
+
+    \begin{center}
+    \begin{tikzpicture}[
+        level distance=10mm,
+        level 1/.style={sibling distance=40mm}
+    ]
+        \node [draw, rectangle] {définition}
+            child {node [draw, rectangle] {type~: pointeur vers x}}
+            child {node [draw, rectangle] {variable~: y}} ;
+    \end{tikzpicture}
+    ~~~~~~~  % this is some hacky alignment…
+    \end{center}
+\end{frame}

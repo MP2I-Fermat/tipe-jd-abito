@@ -22,23 +22,23 @@
 }
 
 %-------------------
-\usepackage[ruled,vlined]{algorithm2e} %pour le pseudo-code
+\usepackage[ruled,vlined,nofillcomment,french,linesnumbered]{algorithm2e} %pour le pseudo-code
 %ajouter l'option linesnumbered si on veut les numéros de lignes
 \SetAlgorithmName{Algorithme}{Algo}{Liste des algorithmes}
 \SetFuncArgSty{textup}%style des arguments des fonctions pas en gras
 \SetArgSty{textup}%style des condidtions des if, for, while pas en gras
 
 
-\SetKwFor{ForEach}{pour tout}{faire}{}
-\SetKwFor{For}{pour}{faire}{finpour}
-\SetKwIF{Si}{SinonSi}{Sinon}{si}{alors}{sinon si}{sinon}{}
+%\SetKwFor{ForEach}{pour tout}{faire}{}
+%\SetKwFor{For}{pour}{faire}{finpour}
+%\SetKwIF{Si}{SinonSi}{Sinon}{si}{alors}{sinon si}{sinon}{}
 \SetKwInput{Input}{Entrée}
 \SetKwInput{Output}{Sortie}
-\SetKwProg{myproc}{Procedure}{:}{}
-\SetKw{Return}{retourner}
-\SetKwComment{tcc}{(*}{*)}
-\SetKwFor{Tq}{tant que}{faire}{}
-\SetKwRepeat{Repeter}{répéter}{jusqu’à}
+%\SetKwProg{myproc}{Procedure}{:}{}
+\SetKw{Return}{renvoyer}
+%\SetKwComment{tcc}{(*~}{~*)}
+%\SetKwFor{Tq}{tant que}{faire}{}
+%\SetKwRepeat{Repeter}{répéter}{jusqu’à}
 
 %-------------------
 \usepackage{amsmath,amsfonts,amssymb}
