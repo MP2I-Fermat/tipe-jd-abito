@@ -367,15 +367,18 @@ int main() {
     \frametitle{Algorithme LL(1)~: les ensembles $premier(\dots)$}
 
     \begin{align*}
-        S &\implies +SS \\
-        S &\implies c
+        S &\implies +EE \\
+        E &\implies c \\
+        E &\implies d
     \end{align*}
 
     \pause
 
     \begin{align*}
         premier(c) &= \{c\} \\
-        premier(S) &= \{+, c\}
+        premier(d) &= \{d\} \\
+        premier(E) &= \{c, d\} \\
+        premier(+EE) &= \{+\}
     \end{align*}
 
 \end{frame}
