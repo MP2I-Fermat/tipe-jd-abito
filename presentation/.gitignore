@@ -1,5 +1,14 @@
-beamer_tipe.*
-!beamer_tipe.tex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.pdf
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
 
 _minted/
 
