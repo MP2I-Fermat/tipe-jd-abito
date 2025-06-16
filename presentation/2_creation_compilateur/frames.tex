@@ -1,19 +1,8 @@
-
-\begin{frame}[fragile]
-    \frametitle{Création d’un compilateur}
-    Fonctionnement d’un compilateur \pause
-    \begin{enumerate}
-        \item<2-6> Analyse lexicale
-        \item<3-6> Analyse syntaxique
-        \item<4-5> Compilation
-        \item<5> Édition de liens
-    \end{enumerate}
-\end{frame}
-
+\section{Cr\'eation d'un compilateur}
 
 \newsavebox{\chelloworld}
 \begin{lrbox}{\chelloworld}
-\begin{lstlisting}[language=c, basicstyle=\footnotesize]
+    \begin{lstlisting}[language=c, basicstyle=\footnotesize]
 int main() {
     printf("Hello, world!");
     return 0;
@@ -21,19 +10,19 @@ int main() {
 \end{lstlisting}
 \end{lrbox}
 
-
+\subsection{Principe du compilateur}
 \begin{frame}[fragile]
     \frametitle{Principe du compilateur}
 
     \begin{center}
-    \begin{tikzpicture}[node distance=5mm and 5mm]
-        \node (fichier) [draw, rectangle] {\usebox\chelloworld};
-        \node (compilateur) [draw, rounded rectangle, right=of fichier] {Complilateur};
-        \node (binaire) [draw, rectangle, right=of compilateur] {Binaire};
+        \begin{tikzpicture}[node distance=5mm and 5mm]
+            \node (fichier) [draw, rectangle] {\usebox\chelloworld};
+            \node (compilateur) [draw, rounded rectangle, right=of fichier] {Complilateur};
+            \node (binaire) [draw, rectangle, right=of compilateur] {Binaire};
 
-        \path (fichier) edge[->] (compilateur);
-        \path (compilateur) edge[->] (binaire);
-    \end{tikzpicture}
+            \path (fichier) edge[->] (compilateur);
+            \path (compilateur) edge[->] (binaire);
+        \end{tikzpicture}
     \end{center}
 \end{frame}
 
@@ -46,21 +35,21 @@ int main() {
     \pause
 
     \begin{center}
-    \begin{tikzpicture}[
-        level distance=10mm,
-        level 1/.style={sibling distance=20mm},
-        level 2/.style={sibling distance=10mm},
-    ]
-        \node [draw, rectangle] {+}
+        \begin{tikzpicture}[
+                level distance=10mm,
+                level 1/.style={sibling distance=20mm},
+                level 2/.style={sibling distance=10mm},
+            ]
+            \node [draw, rectangle] {+}
             child {node [draw, rectangle] {$\times$}
-                child {node [draw, circle] {3}}
-                child {node [draw, circle] {6}}
-            }
+                    child {node [draw, circle] {3}}
+                    child {node [draw, circle] {6}}
+                }
             child {node [draw, rectangle] {$\times$}
-                child {node [draw, circle] {5}}
-                child {node [draw, circle] {3}}
-            };
-    \end{tikzpicture}
+                    child {node [draw, circle] {5}}
+                    child {node [draw, circle] {3}}
+                };
+        \end{tikzpicture}
     \end{center}
 \end{frame}
 
@@ -75,15 +64,15 @@ int main() {
     \pause
 
     \begin{center}
-    \begin{tikzpicture}[
-        level 1/.style={sibling distance=50mm}
-    ]
-        \node [draw, rectangle] {Appel de fonction}
+        \begin{tikzpicture}[
+                level 1/.style={sibling distance=50mm}
+            ]
+            \node [draw, rectangle] {Appel de fonction}
             child { node [draw, rectangle] {printf} }
             child { node [draw, rectangle] {Arguments}
-                child { node [draw, rectangle] {"Hello, world!\textbackslash{}n"} }
-            };
-    \end{tikzpicture}
+                    child { node [draw, rectangle] {"Hello, world!\textbackslash{}n"} }
+                };
+        \end{tikzpicture}
     \end{center}
 \end{frame}
 
@@ -98,23 +87,24 @@ int main() {
     \pause
 
     \begin{center}
-    \begin{tikzpicture}[
-        level 1/.style={sibling distance=50mm}
-    ]
-        \node [draw, rectangle] {Appel de fonction}
+        \begin{tikzpicture}[
+                level 1/.style={sibling distance=50mm}
+            ]
+            \node [draw, rectangle] {Appel de fonction}
             child { node [draw, rectangle] {printf} }
             child { node [draw, rectangle] {Arguments}
-                child { node [draw, rectangle] {"\%s\textbackslash{}n"} }
-                child { node [draw, rectangle] {+}
-                    child { node [draw, rectangle] {n} }
-                    child { node [draw, rectangle] {3} }
-                }
-            };
-    \end{tikzpicture}
+                    child { node [draw, rectangle] {"\%s\textbackslash{}n"} }
+                    child { node [draw, rectangle] {+}
+                            child { node [draw, rectangle] {n} }
+                            child { node [draw, rectangle] {3} }
+                        }
+                };
+        \end{tikzpicture}
     \end{center}
 \end{frame}
 
 
+\subsection{Analyse lexicale}
 \begin{frame}[fragile]
     \frametitle{Analyseur lexical}
 
@@ -124,9 +114,9 @@ int main() {
     \vspace{2em}
 
     \begin{tikzpicture}[
-        every node/.style={draw, rectangle},
-        node distance=1mm and 1mm
-    ]
+            every node/.style={draw, rectangle},
+            node distance=1mm and 1mm
+        ]
         \node (int) {\verb|int|};
         \node (main) [right=of int] {\verb|main|};
         \node (lparen1) [right=of main] {\verb|(|};
@@ -158,9 +148,9 @@ int main() {
 
     On choisira~:
     \begin{tikzpicture}[
-        every node/.style={draw, rectangle},
-        node distance=1mm and 1mm
-    ]
+            every node/.style={draw, rectangle},
+            node distance=1mm and 1mm
+        ]
         \node (variable1) {\verb|var|};
         \node (plusplus) [right=of variable1] {\verb|++|};
         \node (semicolon1) [right=of plusplus] {\verb|;|};
@@ -172,9 +162,9 @@ int main() {
 
     Et non~:
     \begin{tikzpicture}[
-        every node/.style={draw, rectangle},
-        node distance=1mm and 1mm
-    ]
+            every node/.style={draw, rectangle},
+            node distance=1mm and 1mm
+        ]
         \node (variable1) {\verb|v|};
         \node (variable2) [right=of variable1] {\verb|a|};
         \node (variable3) [right=of variable2] {\verb|r|};
@@ -207,26 +197,26 @@ int main() {
     $(\verb|plus|, +)$, …
 \end{frame}
 
-
+\subsection{Analyse syntaxique}
 \begin{frame}[fragile]
     \frametitle{Grammaire~: exemple de la grammaire française}
 
     \[
-    \begin{aligned}
-        \text{Phrase} &\to \text{Sujet Verbe Complément} \\
-        \pause
-        \text{Sujet} &\to \text{Groupe nominal} \\
-        \text{Sujet} &\to \text{Pronom personnel sujet} \\
-        \pause
-        \text{Complément} &\to \text{Groupe nominal} \\
-        \pause
-        \text{Groupe nominal} &\to \text{Déterminant Nom} \\
-        \pause
-        \text{Verbe} &\to v \\
-        \text{Pronom personnel sujet} &\to p_s \\
-        \text{Déterminant} &\to d \\
-        \text{Nom} &\to n \\
-    \end{aligned}
+        \begin{aligned}
+            \text{Phrase}                 & \to \text{Sujet Verbe Complément} \\
+            \pause
+            \text{Sujet}                  & \to \text{Groupe nominal}         \\
+            \text{Sujet}                  & \to \text{Pronom personnel sujet} \\
+            \pause
+            \text{Complément}             & \to \text{Groupe nominal}         \\
+            \pause
+            \text{Groupe nominal}         & \to \text{Déterminant Nom}        \\
+            \pause
+            \text{Verbe}                  & \to v                             \\
+            \text{Pronom personnel sujet} & \to p_s                           \\
+            \text{Déterminant}            & \to d                             \\
+            \text{Nom}                    & \to n                             \\
+        \end{aligned}
     \]
 \end{frame}
 
@@ -238,23 +228,23 @@ int main() {
     \pause
 
     \[
-    \begin{aligned}
-        \text{Phrase} &\implies \text{Sujet Verbe Complément} \\
-        \pause
-                      &\implies \text{Pronom personnel sujet Verbe Complément} \\
-        \pause
-                      &\implies \text{\textit{Je} Verbe Complément} \\
-        \pause
-                      &\implies \text{\textit{Je mange} Complément} \\
-        \pause
-                      &\implies \text{\textit{Je mange} Groupe nominal} \\
-        \pause
-                      &\implies \text{\textit{Je mange} Déterminant Nom} \\
-        \pause
-                      &\implies \text{\textit{Je mange une} Nom} \\
-        \pause
-                      &\implies \text{\textit{Je mange une pomme}} \\
-    \end{aligned}
+        \begin{aligned}
+            \text{Phrase} & \implies \text{Sujet Verbe Complément}                  \\
+            \pause
+                          & \implies \text{Pronom personnel sujet Verbe Complément} \\
+            \pause
+                          & \implies \text{\textit{Je} Verbe Complément}            \\
+            \pause
+                          & \implies \text{\textit{Je mange} Complément}            \\
+            \pause
+                          & \implies \text{\textit{Je mange} Groupe nominal}        \\
+            \pause
+                          & \implies \text{\textit{Je mange} Déterminant Nom}       \\
+            \pause
+                          & \implies \text{\textit{Je mange une} Nom}               \\
+            \pause
+                          & \implies \text{\textit{Je mange une pomme}}             \\
+        \end{aligned}
     \]
 
 \end{frame}
@@ -299,23 +289,23 @@ int main() {
     \pause
 
     \begin{center}
-    \begin{tikzpicture}
-    [
-        level 1/.style={sibling distance=25mm}
-    ]
-        \node [draw, rectangle] {Phrase}
+        \begin{tikzpicture}
+            [
+                level 1/.style={sibling distance=25mm}
+            ]
+            \node [draw, rectangle] {Phrase}
             child { node [draw, rectangle] {Sujet}
-                child { node [draw, rectangle] {La} }
-                child { node [draw, rectangle] {petite} }
-            }
+                    child { node [draw, rectangle] {La} }
+                    child { node [draw, rectangle] {petite} }
+                }
             child { node [draw, rectangle] {Verbe}
-                child { node [draw, rectangle] {brise} }
-            }
+                    child { node [draw, rectangle] {brise} }
+                }
             child { node [draw, rectangle] {Complément}
-                child { node [draw, rectangle] {la} }
-                child { node [draw, rectangle] {glace} }
-            };
-    \end{tikzpicture}
+                    child { node [draw, rectangle] {la} }
+                    child { node [draw, rectangle] {glace} }
+                };
+        \end{tikzpicture}
     \end{center}
 \end{frame}
 
@@ -324,24 +314,24 @@ int main() {
     La petite brise la glace
 
     \begin{center}
-    \begin{tikzpicture}
-    [
-        level 1/.style={sibling distance=30mm},
-        level 2/.style={sibling distance=15mm}
-    ]
-        \node [draw, rectangle] {Phrase}
+        \begin{tikzpicture}
+            [
+                level 1/.style={sibling distance=30mm},
+                level 2/.style={sibling distance=15mm}
+            ]
+            \node [draw, rectangle] {Phrase}
             child { node [draw, rectangle] {Sujet}
-                child { node [draw, rectangle] {La} }
-                child { node [draw, rectangle] {petite} }
-                child { node [draw, rectangle] {brise} }
-            }
+                    child { node [draw, rectangle] {La} }
+                    child { node [draw, rectangle] {petite} }
+                    child { node [draw, rectangle] {brise} }
+                }
             child { node [draw, rectangle] {Complément}
-                child { node [draw, rectangle] {la} }
-            }
+                    child { node [draw, rectangle] {la} }
+                }
             child { node [draw, rectangle] {Verbe}
-                child { node [draw, rectangle] {glace} }
-            };
-    \end{tikzpicture}
+                    child { node [draw, rectangle] {glace} }
+                };
+        \end{tikzpicture}
     \end{center}
 \end{frame}
 
@@ -367,18 +357,18 @@ int main() {
     \frametitle{Algorithme LL(1)~: les ensembles $premier(\dots)$}
 
     \begin{align*}
-        S &\implies +EE \\
-        E &\implies c \\
-        E &\implies d
+        S & \implies +EE \\
+        E & \implies c   \\
+        E & \implies d
     \end{align*}
 
     \pause
 
     \begin{align*}
-        premier(c) &= \{c\} \\
-        premier(d) &= \{d\} \\
-        premier(E) &= \{c, d\} \\
-        premier(+EE) &= \{+\}
+        premier(c)   & = \{c\}    \\
+        premier(d)   & = \{d\}    \\
+        premier(E)   & = \{c, d\} \\
+        premier(+EE) & = \{+\}
     \end{align*}
 
 \end{frame}
@@ -398,8 +388,8 @@ int main() {
             \Si{$texte[0] = \alpha$}{
                 \Return{
                     $\vcenter{\hbox{\begin{tikzpicture}
-                        \node[draw,rectangle]{$texte[0]$};
-                    \end{tikzpicture}}}$,
+                                    \node[draw,rectangle]{$texte[0]$};
+                                \end{tikzpicture}}}$,
                     $texte[1...]$
                 }\;
             }
@@ -435,14 +425,14 @@ int main() {
 
         \Return{
             $\vcenter{\hbox{\begin{tikzpicture}[
-                level distance=10mm,
-                level 1/.style={sibling distance=20mm},
-            ]
-                \node [draw, circle] {$\alpha$}
-                    child {node[draw,rectangle]{$ss\_arbre_1$}}
-                    child {node[draw,rectangle]{$ss\_arbre_2$}}
-                    child {node {$\dots$}} ;
-            \end{tikzpicture}}}$,
+                                level distance=10mm,
+                                level 1/.style={sibling distance=20mm},
+                            ]
+                            \node [draw, circle] {$\alpha$}
+                            child {node[draw,rectangle]{$ss\_arbre_1$}}
+                            child {node[draw,rectangle]{$ss\_arbre_2$}}
+                            child {node {$\dots$}} ;
+                        \end{tikzpicture}}}$,
             $texte_n$
         }\;
 
@@ -456,17 +446,17 @@ int main() {
     \frametitle{Problème de LL(1)}
 
     \begin{align*}
-        S &\implies I \\
-        S &\implies E \\
-        I &\implies \text{if} \dots \text{then} \dots \text{end} \\
-        E &\implies \text{if} \dots \text{then} \dots \text{else} \dots \text{end}
+        S & \implies I                                                              \\
+        S & \implies E                                                              \\
+        I & \implies \text{if} \dots \text{then} \dots \text{end}                   \\
+        E & \implies \text{if} \dots \text{then} \dots \text{else} \dots \text{end}
     \end{align*}
 
     \pause
 
     \begin{align*}
-        premier(I) &= \{\text{if}\} \\
-        premier(E) &= \{\text{if}\}
+        premier(I) & = \{\text{if}\} \\
+        premier(E) & = \{\text{if}\}
     \end{align*}
 
     Ici, $premier(I) \cap premier(E) \ne \varnothing$~: la grammaire n’est
@@ -482,35 +472,43 @@ int main() {
     \frametitle{C n’est ni LL ni LR…}
 
     \begin{center}
-    \verb|x * y;|
+        \verb|x * y;|
     \end{center}
 
     \pause
     \vspace{1em}
 
     \begin{center}
-    \begin{tikzpicture}[
-        level distance=10mm,
-        level 1/.style={sibling distance=20mm}
-    ]
-        \node [draw, rectangle] {*}
+        \begin{tikzpicture}[
+                level distance=10mm,
+                level 1/.style={sibling distance=20mm}
+            ]
+            \node [draw, rectangle] {*}
             child {node[draw,rectangle]{x}}
             child {node[draw,rectangle]{y}} ;
-    \end{tikzpicture}
+        \end{tikzpicture}
     \end{center}
 
     \pause
     \vspace{1em}
 
     \begin{center}
-    \begin{tikzpicture}[
-        level distance=10mm,
-        level 1/.style={sibling distance=40mm}
-    ]
-        \node [draw, rectangle] {définition}
+        \begin{tikzpicture}[
+                level distance=10mm,
+                level 1/.style={sibling distance=40mm}
+            ]
+            \node [draw, rectangle] {définition}
             child {node [draw, rectangle] {type~: pointeur vers x}}
             child {node [draw, rectangle] {variable~: y}} ;
-    \end{tikzpicture}
-    ~~~~~~~  % this is some hacky alignment…
+        \end{tikzpicture}
+        ~~~~~~~  % this is some hacky alignment…
     \end{center}
 \end{frame}
+
+\subsection{\textcolor{gray}{\emph{Compilation}}}
+\subsection{\textcolor{gray}{\emph{\'Edition de liens}}}
+
+% Blank frame to ensure empty subsections appear in summary.
+\begin{frame}
+\end{frame}
+\addtocounter{framenumber}{-1}
