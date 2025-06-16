@@ -340,10 +340,11 @@ int main() {
 
     \begin{enumerate}
         \item LL(1)
-        \item LR(1)
+        \item LR(0)
     \end{enumerate}
 \end{frame}
 
+\subsubsection{LL(1)}
 \begin{frame}[fragile]
     \frametitle{Algorithme LL(1)}
 
@@ -463,10 +464,79 @@ int main() {
     \textbf{pas LL(1)}~!
 \end{frame}
 
+\subsubsection{LR(0)}
 \begin{frame}[fragile]
-    \frametitle{LR(1)}
+    \frametitle{LR(0)}
+
+    \textit{Left to right, Rightmost derivation}
+
+    Contextualisation à l’aide d’automates
+
+    \pause
+
+    \begin{align*}
+        S & \to aTx \\
+        S & \to bUy \\
+        T & \to c   \\
+        U & \to c
+    \end{align*}
+
+    Que faire quand on lit $c$~?
 \end{frame}
 
+
+\begin{frame}[fragile]
+    \frametitle{LR(0)~: Automates}
+
+    \begin{tikzpicture}[node distance=5mm and 5mm]
+        \node (etat1) [draw, rectangle] {
+            $\begin{aligned}
+                S &\implies \pointeur aTx \\
+                S &\implies \pointeur bUy
+            \end{aligned}$
+        };
+        \node (etat2) [draw, rectangle, above right=of etat1, yshift=-10mm] {
+            $\begin{aligned}
+                S &\implies a \pointeur Tx \\
+                T &\implies \pointeur c
+            \end{aligned}$
+        };
+        \node (etat3) [draw, rectangle, above=of etat2] {
+            $ T \implies c \pointeur $
+        };
+        \node (etat4) [draw, rectangle, right=of etat2] {
+            $ S \implies aT \pointeur x $
+        };
+        \node (etat5) [draw, rectangle, right=of etat4] {
+            $ S \implies aTx \pointeur $
+        };
+        \node (etat6) [draw, rectangle, below right=of etat1, yshift=10mm] {
+            $\begin{aligned}
+                S &\implies b \pointeur Uy \\
+                U &\implies \pointeur c
+            \end{aligned}$
+        };
+        \node (etat7) [draw, rectangle, below=of etat6] {
+            $ U \implies c \pointeur $
+        };
+        \node (etat8) [draw, rectangle, right=of etat6] {
+            $ S \implies bU \pointeur y $
+        };
+        \node (etat9) [draw, rectangle, right=of etat8] {
+            $ S \implies bUy \pointeur $
+        };
+
+        \draw (etat1) edge[->] node[below] {a} (etat2);
+        \draw (etat2) edge[->] node[right] {c} (etat3);
+        \draw (etat2) edge[->] node[below] {T} (etat4);
+        \draw (etat4) edge[->] node[below] {x} (etat5);
+        \draw (etat1) edge[->] node[below] {b} (etat6);
+        \draw (etat6) edge[->] node[right] {c} (etat7);
+        \draw (etat6) edge[->] node[below] {U} (etat8);
+        \draw (etat8) edge[->] node[below] {y} (etat9);
+    \end{tikzpicture}
+
+\end{frame}
 
 \begin{frame}[fragile]
     \frametitle{C n’est ni LL ni LR…}
