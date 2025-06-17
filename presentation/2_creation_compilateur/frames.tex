@@ -509,42 +509,42 @@ int main() {
 \begin{frame}[fragile]
     \frametitle{LR(0)~: Automates}
 
-    \begin{tikzpicture}[node distance=5mm and 5mm]
+    \begin{tikzpicture}[node distance=5mm and 10mm]
         \node (etat1) [draw, rectangle] {
             $\begin{aligned}
-                    S & \implies \pointeur aTx \\
-                    S & \implies \pointeur bUy
+                    S & \to \pointeur aTx \\
+                    S & \to \pointeur bUy
                 \end{aligned}$
         };
         \node (etat2) [draw, rectangle, above right=of etat1, yshift=-10mm] {
             $\begin{aligned}
-                    S & \implies a \pointeur Tx \\
-                    T & \implies \pointeur c
+                    S & \to a \pointeur Tx \\
+                    T & \to \pointeur c
                 \end{aligned}$
         };
         \node (etat3) [draw, rectangle, above=of etat2] {
-            $ T \implies c \pointeur $
+            $ T \to c \pointeur $
         };
         \node (etat4) [draw, rectangle, right=of etat2] {
-            $ S \implies aT \pointeur x $
+            $ S \to aT \pointeur x $
         };
         \node (etat5) [draw, rectangle, right=of etat4] {
-            $ S \implies aTx \pointeur $
+            $ S \to aTx \pointeur $
         };
         \node (etat6) [draw, rectangle, below right=of etat1, yshift=10mm] {
             $\begin{aligned}
-                    S & \implies b \pointeur Uy \\
-                    U & \implies \pointeur c
+                    S & \to b \pointeur Uy \\
+                    U & \to \pointeur c
                 \end{aligned}$
         };
         \node (etat7) [draw, rectangle, below=of etat6] {
-            $ U \implies c \pointeur $
+            $ U \to c \pointeur $
         };
         \node (etat8) [draw, rectangle, right=of etat6] {
-            $ S \implies bU \pointeur y $
+            $ S \to bU \pointeur y $
         };
         \node (etat9) [draw, rectangle, right=of etat8] {
-            $ S \implies bUy \pointeur $
+            $ S \to bUy \pointeur $
         };
 
         \draw (etat1) edge[->] node[below] {a} (etat2);
