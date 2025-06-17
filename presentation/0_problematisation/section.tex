@@ -6,79 +6,49 @@
 \begin{frame}
     \frametitle{Pourquoi bootstrapper?\esp}
 
-    \begin{center}
-        \uncover<2->{\tikz{
-                \node (program) {Programme executable}
-            }}
-    \end{center}
-
-
-    \vspace{1cm}
-
-    \hbox{
-        \begin{minipage}{.7\textwidth}
-            \centering
-            \tikz{
-                \node (source_code) {
-                    \begin{minipage}{\textwidth}
-                        \mint{ocaml}|print_endline "Hello, World!";;|
-                    \end{minipage}
-                }
-            }
-        \end{minipage}
-        \begin{minipage}{.3\textwidth}
-            \centering
-            \uncover<2->{
-                \tikz{
-                    \node (ocamlc) {
-                        \boxed{\texttt{ocamlc}}
-                    }
-                }
-            }
-        \end{minipage}
-    }
-
-    \vspace{1cm}
-
-    \hbox{
-        \begin{minipage}{.7\textwidth}
-            \centering
-            \uncover<3->{
-                \tikz{
-                    \node (hand_written) {
-                        Écrit a la main
-                    }
-                }
-            }
-        \end{minipage}
-        \begin{minipage}{.3\textwidth}
-            \centering
-            \uncover<4->{
-                \tikz{
-                    \node (unknown) {
-                        \begin{minipage}{.3\textwidth}
-                            \centering
-                            \only<4>{?}
-                            \only<5->{\textbf{Bootstrap}}
-                        \end{minipage}
-                    }
-                }
-            }
-        \end{minipage}
-    }
-
-    \begin{tikzpicture}[overlay,in=-90,out=90]
+    \begin{tikzpicture}[out=90, in=-90]
+        \node (ocaml_source) at (-1, 0) {
+            \begin{minipage}{\textwidth}
+                \mint{ocaml}|print_endline "Hello, World!";|
+            \end{minipage}
+        };
 
         \uncover<2->{
-            \draw[-latex] (source_code.north) to (program.south);
-            \draw[-latex] (ocamlc.north) to (program.south);
+            \node (programme) at (-1, 2) {
+                Programme executable
+            };
+
+            \node (ocamlc) at (3, 0) {
+                \boxed{\texttt{ocamlc}}
+            };
+
+            \draw[-latex] (ocaml_source.north) to (programme.south);
+            \draw[-latex] (ocamlc.north) to (programme.south);
         }
+
         \uncover<3->{
-            \draw[-latex] (hand_written.north) to (source_code.south);
+            \node (hand_written) at (-1, -2) {Écrit a la main};
+
+            \draw [-latex] (hand_written.north) to (ocaml_source.south);
         }
+
         \uncover<4->{
-            \draw[-latex] (unknown.north) to (ocamlc.south);
+            \node (bootstrap) at (3, -2) {
+                \only<4>{?}
+                \only<5->{\textbf{Bootstrap}}
+            };
+
+            \draw[-latex] (bootstrap.north) to (ocamlc.south);
         }
     \end{tikzpicture}
 
+    \vspace{.5cm}
+
+    \uncover<6->{
+        \begin{itemize}
+            \item Nécessité de pouvoir compiler le compilateur
+            \item Archivage
+            \item Vérification et sécurité
+        \end{itemize}
+    }
 \end{frame}
