@@ -134,18 +134,39 @@ int main() {
     \end{tikzpicture}
 \end{frame}
 
-
 \begin{frame}[fragile]
-    \frametitle{Analyseur lexical~: lexèmes}
+    \frametitle{Analyseur lexical}
 
-    Couples $(\text{type}, \text{valeur})$.
+    {\usebox\chelloworld}
 
-    \pause
-    \vspace{2em}
-
-    Exemples~: $(\verb|int|, 12)$, $(\verb|identifier|, \verb|main|)$,
-    $(\verb|keyword|, \verb|int|)$, $(\verb|string|, \verb|"Hello, world"|)$,
-    $(\verb|plus|, +)$, …
+    \hbox{
+        \begin{minipage}{0.5\textwidth}
+            \begin{lstlisting}
+type   value
+------------
+60     int
+6      main
+9      (
+10     )
+11     {
+6      printf
+9      (
+\end{lstlisting}
+        \end{minipage}
+        \begin{minipage}{0.5\textwidth}
+            \begin{lstlisting}
+type   value
+------------
+53     "Hello, world!\n"
+10     )
+39     ;
+60     return
+1      0
+39     ;
+12     }
+\end{lstlisting}
+        \end{minipage}
+    }
 \end{frame}
 
 
