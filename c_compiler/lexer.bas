@@ -203,7 +203,7 @@ rem Does not check if EOF is reached - please check that ci.current_char is <> 0
 rem before calling
 function nextchar (old_ci as char_and_index, f as integer) as char_and_index
     dim ci as char_and_index
-    if ci.current_char = 10 then
+    if old_ci.current_char = 10 then
         ci.beginning_of_line = true
     else
         ci.beginning_of_line = false
@@ -384,8 +384,7 @@ function lexer (f as integer, C_99_KEYWORDS(any) as string, tokens(any) as token
         endif
 
         if ci.current_char = 10 then
-            rem \n
-            ci.beginning_of_line = true
+            rem \n, nothing to do
         elseif ci.current_char >= &h30 andalso ci.current_char <= &h39 then
             rem numbers
             cit = make_num(ci, tokens(), f)
@@ -409,7 +408,7 @@ function lexer (f as integer, C_99_KEYWORDS(any) as string, tokens(any) as token
             newtok(temporary_token, tokens(), tok_index)
         elseif (chr(ci.current_char) = "]") then
             temporary_token = create_new_token(ci.index)
-            temporary_token.tok_type = TOK_LSQUARE
+            temporary_token.tok_type = TOK_RSQUARE
             newtok(temporary_token, tokens(), tok_index)
         elseif (chr(ci.current_char) = "(") then
             temporary_token = create_new_token(ci.index)
@@ -716,7 +715,7 @@ end sub
 
 dim f as integer
 f = freefile
-open "test.c" for binary as #f
+open "coucou.cpp" for binary as #f
 if err > 0 then print "Error opening the file. Error code:"; err : end
 
 dim len_tokens as integer
