@@ -291,20 +291,24 @@ int main() {
     \begin{center}
         \begin{tikzpicture}
             [
-                level 1/.style={sibling distance=25mm}
+                level 1/.style={sibling distance=25mm},
+                level 2/.style={sibling distance=15mm},
             ]
             \node [draw, rectangle] {Phrase}
-            child { node [draw, rectangle] {Sujet}
+            child { node [draw, rectangle, Green, thick, minimum height=7mm] {Sujet}
                     child { node [draw, rectangle] {La} }
                     child { node [draw, rectangle] {petite} }
                 }
-            child { node [draw, rectangle] {Verbe}
+            child { node [draw, rectangle, red, thick, minimum height=7mm] {Verbe}
                     child { node [draw, rectangle] {brise} }
                 }
-            child { node [draw, rectangle] {Complément}
+            child { node [draw, rectangle, blue, thick, minimum height=7mm] {Complément}
                     child { node [draw, rectangle] {la} }
                     child { node [draw, rectangle] {glace} }
                 };
+
+            \node at (-5, 0) {};
+            \node at (5, 0) {};
         \end{tikzpicture}
     \end{center}
 \end{frame}
@@ -316,21 +320,24 @@ int main() {
     \begin{center}
         \begin{tikzpicture}
             [
-                level 1/.style={sibling distance=30mm},
+                level 1/.style={sibling distance=25mm},
                 level 2/.style={sibling distance=15mm}
             ]
             \node [draw, rectangle] {Phrase}
-            child { node [draw, rectangle] {Sujet}
+            child { node [draw, rectangle, Green, thick, minimum height=7mm] {Sujet}
                     child { node [draw, rectangle] {La} }
                     child { node [draw, rectangle] {petite} }
                     child { node [draw, rectangle] {brise} }
                 }
-            child { node [draw, rectangle] {Complément}
+            child { node [draw, rectangle, blue, thick, minimum height=7mm] {Complément}
                     child { node [draw, rectangle] {la} }
                 }
-            child { node [draw, rectangle] {Verbe}
+            child { node [draw, rectangle, red, thick, minimum height=7mm] {Verbe}
                     child { node [draw, rectangle] {glace} }
                 };
+
+            \node at (-5, 0) {};
+            \node at (5, 0) {};
         \end{tikzpicture}
     \end{center}
 \end{frame}
