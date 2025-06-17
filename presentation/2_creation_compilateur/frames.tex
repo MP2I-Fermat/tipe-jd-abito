@@ -491,6 +491,20 @@ int main() {
     Que faire quand on lit $c$~?
 \end{frame}
 
+% à mettre dans l’annexe ?
+%\begin{frame}[fragile]
+%    \frametitle{Exemple concret}
+%    \begin{align*}
+%        S   & \to LN_v=V             \\
+%        S   & \to DN_f(P) \,-\!\!> V \\
+%        N_v & \to \text{identifiant} \\
+%        N_f & \to \text{identifiant} \\
+%        L   & \to \textit{let}       \\
+%        D   & \to \textit{def}       \\
+%        V   & \to \dots              \\
+%        P   & \to \dots
+%    \end{align*}
+%\end{frame}
 
 \begin{frame}[fragile]
     \frametitle{LR(0)~: Automates}
@@ -498,15 +512,15 @@ int main() {
     \begin{tikzpicture}[node distance=5mm and 5mm]
         \node (etat1) [draw, rectangle] {
             $\begin{aligned}
-                S &\implies \pointeur aTx \\
-                S &\implies \pointeur bUy
-            \end{aligned}$
+                    S & \implies \pointeur aTx \\
+                    S & \implies \pointeur bUy
+                \end{aligned}$
         };
         \node (etat2) [draw, rectangle, above right=of etat1, yshift=-10mm] {
             $\begin{aligned}
-                S &\implies a \pointeur Tx \\
-                T &\implies \pointeur c
-            \end{aligned}$
+                    S & \implies a \pointeur Tx \\
+                    T & \implies \pointeur c
+                \end{aligned}$
         };
         \node (etat3) [draw, rectangle, above=of etat2] {
             $ T \implies c \pointeur $
@@ -519,9 +533,9 @@ int main() {
         };
         \node (etat6) [draw, rectangle, below right=of etat1, yshift=10mm] {
             $\begin{aligned}
-                S &\implies b \pointeur Uy \\
-                U &\implies \pointeur c
-            \end{aligned}$
+                    S & \implies b \pointeur Uy \\
+                    U & \implies \pointeur c
+                \end{aligned}$
         };
         \node (etat7) [draw, rectangle, below=of etat6] {
             $ U \implies c \pointeur $
