@@ -136,6 +136,20 @@ int main() {
 
 
 \begin{frame}[fragile]
+    \frametitle{Analyseur lexical~: lexèmes}
+
+    Couples $(\text{type}, \text{valeur})$.
+
+    \pause
+    \vspace{2em}
+
+    Exemples~: $(\verb|int|, 12)$, $(\verb|identifier|, \verb|main|)$,
+    $(\verb|keyword|, \verb|int|)$, $(\verb|string|, \verb|"Hello, world"|)$,
+    $(\verb|plus|, +)$, …
+\end{frame}
+
+
+\begin{frame}[fragile]
     \frametitle{Analyseur lexical~: choix du plus long lexème possible}
 
     \begin{lstlisting}[language=c]
@@ -184,38 +198,25 @@ int main() {
 \end{frame}
 
 
-\begin{frame}[fragile]
-    \frametitle{Analyseur lexical~: lexèmes}
-
-    Couples $(\text{type}, \text{valeur})$.
-
-    \pause
-    \vspace{2em}
-
-    Exemples~: $(\verb|int|, 12)$, $(\verb|identifier|, \verb|main|)$,
-    $(\verb|keyword|, \verb|int|)$, $(\verb|string|, \verb|"Hello, world"|)$,
-    $(\verb|plus|, +)$, …
-\end{frame}
-
 \subsection{Analyse syntaxique}
 \begin{frame}[fragile]
     \frametitle{Grammaire~: exemple de la grammaire française}
 
     \[
         \begin{aligned}
-            \text{Phrase}                 & \to \text{Sujet Verbe Complément} \\
+            \text{Phrase}                   & \to \text{Sujet Verbe Complément}   \\
             \pause
-            \text{Sujet}                  & \to \text{Groupe nominal}         \\
-            \text{Sujet}                  & \to \text{Pronom personnel sujet} \\
+            \text{Sujet}                    & \to \text{Groupe\_nominal}          \\
+            \text{Sujet}                    & \to \text{Pronom\_personnel\_sujet} \\
             \pause
-            \text{Complément}             & \to \text{Groupe nominal}         \\
+            \text{Complément}               & \to \text{Groupe\_nominal}          \\
             \pause
-            \text{Groupe nominal}         & \to \text{Déterminant Nom}        \\
+            \text{Groupe\_nominal}          & \to \text{Déterminant Nom}          \\
             \pause
-            \text{Verbe}                  & \to v                             \\
-            \text{Pronom personnel sujet} & \to p_s                           \\
-            \text{Déterminant}            & \to d                             \\
-            \text{Nom}                    & \to n                             \\
+            \text{Verbe}                    & \to v                               \\
+            \text{Pronom\_personnel\_sujet} & \to p_s                             \\
+            \text{Déterminant}              & \to d                               \\
+            \text{Nom}                      & \to n                               \\
         \end{aligned}
     \]
 \end{frame}
@@ -223,29 +224,56 @@ int main() {
 \begin{frame}[fragile]
     \frametitle{Grammaire~: exemple de la grammaire française}
 
-    Je mange une pomme
-
-    \pause
-
-    \[
-        \begin{aligned}
-            \text{Phrase} & \implies \text{Sujet Verbe Complément}                  \\
-            \pause
-                          & \implies \text{Pronom personnel sujet Verbe Complément} \\
-            \pause
-                          & \implies \text{\textit{Je} Verbe Complément}            \\
-            \pause
-                          & \implies \text{\textit{Je mange} Complément}            \\
-            \pause
-                          & \implies \text{\textit{Je mange} Groupe nominal}        \\
-            \pause
-                          & \implies \text{\textit{Je mange} Déterminant Nom}       \\
-            \pause
-                          & \implies \text{\textit{Je mange une} Nom}               \\
-            \pause
-                          & \implies \text{\textit{Je mange une pomme}}             \\
-        \end{aligned}
-    \]
+    \begin{tikzpicture}
+        \node at (3,2) {
+            \tiny
+            $
+            \begin{aligned}
+                \text{Phrase}                   & \to \text{Sujet Verbe Complément}   \\
+                \text{Sujet}                    & \to \text{Groupe\_nominal}          \\
+                \text{Sujet}                    & \to \text{Pronom\_personnel\_sujet} \\
+                \text{Complément}               & \to \text{Groupe\_nominal}          \\
+                \text{Groupe\_nominal}          & \to \text{Déterminant Nom}          \\
+                \text{Verbe}                    & \to v                               \\
+                \text{Pronom\_personnel\_sujet} & \to p_s                             \\
+                \text{Déterminant}              & \to d                               \\
+                \text{Nom}                      & \to n                               \\
+            \end{aligned}
+            $
+        };
+        \node at (-3,2) {Je mange une pomme};
+        \node at (-1,-2) {
+            \footnotesize
+            $
+                \begin{aligned}
+                    \uncover<2->{
+                    \text{Phrase} & \implies \text{Sujet Verbe Complément}                  \\
+                    }
+                    \uncover<3->{
+                                  & \implies \text{Pronom\_personnel\_sujet Verbe Complément} \\
+                    }
+                    \uncover<4->{
+                                  & \implies \text{\color{red}\textit{Je} \color{black}Verbe Complément}            \\
+                    }
+                    \uncover<5->{
+                                  & \implies \text{\color{red}\textit{Je mange} \color{black}Complément}            \\
+                    }
+                    \uncover<6->{
+                                  & \implies \text{\color{red}\textit{Je mange} \color{black}Groupe\_nominal}        \\
+                    }
+                    \uncover<7->{
+                                  & \implies \text{\color{red}\textit{Je mange} \color{black}Déterminant Nom}       \\
+                    }
+                    \uncover<8->{
+                                  & \implies \text{\color{red}\textit{Je mange une} \color{black}Nom}               \\
+                    }
+                    \uncover<9->{
+                                  & \implies \text{\color{red}\textit{Je mange une pomme}}             \\
+                    }
+                \end{aligned}
+            $
+        };
+    \end{tikzpicture}
 
 \end{frame}
 
@@ -342,14 +370,14 @@ int main() {
     \end{center}
 \end{frame}
 
-\begin{frame}[fragile]
-    \frametitle{Algorithmes d’analyse lexicale}
-
-    \begin{enumerate}
-        \item LL(1)
-        \item LR(0)
-    \end{enumerate}
-\end{frame}
+%\begin{frame}[fragile]
+%    \frametitle{Algorithmes d’analyse lexicale}
+%
+%    \begin{enumerate}
+%        \item LL(1)
+%        \item LR(0)
+%    \end{enumerate}
+%\end{frame}
 
 \subsubsection{LL(1)}
 \begin{frame}[fragile]
@@ -471,25 +499,25 @@ int main() {
     \textbf{pas LL(1)}~!
 \end{frame}
 
-\subsubsection{LR(0)}
-\begin{frame}[fragile]
-    \frametitle{LR(0)}
-
-    \textit{Left to right, Rightmost derivation}
-
-    Contextualisation à l’aide d’automates
-
-    \pause
-
-    \begin{align*}
-        S & \to aTx \\
-        S & \to bUy \\
-        T & \to c   \\
-        U & \to c
-    \end{align*}
-
-    Que faire quand on lit $c$~?
-\end{frame}
+%\subsubsection{LR(0)}
+%\begin{frame}[fragile]
+%    \frametitle{LR(0)}
+%
+%    \textit{Left to right, Rightmost derivation}
+%
+%    Contextualisation à l’aide d’automates
+%
+%    \pause
+%
+%    \begin{align*}
+%        S & \to aTx \\
+%        S & \to bUy \\
+%        T & \to c   \\
+%        U & \to c
+%    \end{align*}
+%
+%    Que faire quand on lit $c$~?
+%\end{frame}
 
 % à mettre dans l’annexe ?
 %\begin{frame}[fragile]
@@ -506,58 +534,57 @@ int main() {
 %    \end{align*}
 %\end{frame}
 
-\begin{frame}[fragile]
-    \frametitle{LR(0)~: Automates}
-
-    \begin{tikzpicture}[node distance=5mm and 10mm]
-        \node (etat1) [draw, rectangle] {
-            $\begin{aligned}
-                    S & \to \pointeur aTx \\
-                    S & \to \pointeur bUy
-                \end{aligned}$
-        };
-        \node (etat2) [draw, rectangle, above right=of etat1, yshift=-10mm] {
-            $\begin{aligned}
-                    S & \to a \pointeur Tx \\
-                    T & \to \pointeur c
-                \end{aligned}$
-        };
-        \node (etat3) [draw, rectangle, above=of etat2] {
-            $ T \to c \pointeur $
-        };
-        \node (etat4) [draw, rectangle, right=of etat2] {
-            $ S \to aT \pointeur x $
-        };
-        \node (etat5) [draw, rectangle, right=of etat4] {
-            $ S \to aTx \pointeur $
-        };
-        \node (etat6) [draw, rectangle, below right=of etat1, yshift=10mm] {
-            $\begin{aligned}
-                    S & \to b \pointeur Uy \\
-                    U & \to \pointeur c
-                \end{aligned}$
-        };
-        \node (etat7) [draw, rectangle, below=of etat6] {
-            $ U \to c \pointeur $
-        };
-        \node (etat8) [draw, rectangle, right=of etat6] {
-            $ S \to bU \pointeur y $
-        };
-        \node (etat9) [draw, rectangle, right=of etat8] {
-            $ S \to bUy \pointeur $
-        };
-
-        \draw (etat1) edge[->] node[below] {a} (etat2);
-        \draw (etat2) edge[->] node[right] {c} (etat3);
-        \draw (etat2) edge[->] node[below] {T} (etat4);
-        \draw (etat4) edge[->] node[below] {x} (etat5);
-        \draw (etat1) edge[->] node[below] {b} (etat6);
-        \draw (etat6) edge[->] node[right] {c} (etat7);
-        \draw (etat6) edge[->] node[below] {U} (etat8);
-        \draw (etat8) edge[->] node[below] {y} (etat9);
-    \end{tikzpicture}
-
-\end{frame}
+%\begin{frame}[fragile]
+%    \frametitle{LR(0)~: Automates}
+%
+%    \begin{tikzpicture}[node distance=5mm and 10mm]
+%        \node (etat1) [draw, rectangle] {
+%            $\begin{aligned}
+%                    S & \to \pointeur aTx \\
+%                    S & \to \pointeur bUy
+%                \end{aligned}$
+%        };
+%        \node (etat2) [draw, rectangle, above right=of etat1, yshift=-10mm] {
+%            $\begin{aligned}
+%                    S & \to a \pointeur Tx \\
+%                    T & \to \pointeur c
+%                \end{aligned}$
+%        };
+%        \node (etat3) [draw, rectangle, above=of etat2] {
+%            $ T \to c \pointeur $
+%        };
+%        \node (etat4) [draw, rectangle, right=of etat2] {
+%            $ S \to aT \pointeur x $
+%        };
+%        \node (etat5) [draw, rectangle, right=of etat4] {
+%            $ S \to aTx \pointeur $
+%        };
+%        \node (etat6) [draw, rectangle, below right=of etat1, yshift=10mm] {
+%            $\begin{aligned}
+%                    S & \to b \pointeur Uy \\
+%                    U & \to \pointeur c
+%                \end{aligned}$
+%        };
+%        \node (etat7) [draw, rectangle, below=of etat6] {
+%            $ U \to c \pointeur $
+%        };
+%        \node (etat8) [draw, rectangle, right=of etat6] {
+%            $ S \to bU \pointeur y $
+%        };
+%        \node (etat9) [draw, rectangle, right=of etat8] {
+%            $ S \to bUy \pointeur $
+%        };
+%
+%        \draw (etat1) edge[->] node[below] {a} (etat2);
+%        \draw (etat2) edge[->] node[right] {c} (etat3);
+%        \draw (etat2) edge[->] node[below] {T} (etat4);
+%        \draw (etat4) edge[->] node[below] {x} (etat5);
+%        \draw (etat1) edge[->] node[below] {b} (etat6);
+%        \draw (etat6) edge[->] node[right] {c} (etat7);
+%        \draw (etat6) edge[->] node[below] {U} (etat8);
+%        \draw (etat8) edge[->] node[below] {y} (etat9);
+%    \end{tikzpicture}
+%\end{frame}
 
 \begin{frame}[fragile]
     \frametitle{C n’est ni LL ni LR…}
