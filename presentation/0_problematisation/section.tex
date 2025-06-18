@@ -29,10 +29,17 @@
             \draw [-latex] (hand_written.north) to (ocaml_source.south);
         }
 
-        \uncover<4->{
+        \uncover<4>{
             \node (bootstrap) at (3, -2) {
-                \only<4>{?}
-                \only<5->{\textbf{Bootstrap}}
+                ?
+            };
+
+            \draw[-latex] (bootstrap.north) to (ocamlc.south);
+        }
+
+        \uncover<5>{
+            \node (bootstrap) at (3, -2) {
+                \textbf{Bootstrap}
             };
 
             \draw[-latex] (bootstrap.north) to (ocamlc.south);
