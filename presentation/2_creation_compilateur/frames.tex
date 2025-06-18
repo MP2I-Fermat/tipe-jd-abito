@@ -81,7 +81,7 @@ int main() {
     \frametitle{Arbre de syntaxe}
 
     \begin{lstlisting}[language=c]!
-    printf("%s\n", n+3);
+    printf("%d\n", n+3);
     \end{lstlisting}
 
     \pause
@@ -93,7 +93,7 @@ int main() {
             \node [draw, rectangle] {Appel de fonction}
             child { node [draw, rectangle] {printf} }
             child { node [draw, rectangle] {Arguments}
-                    child { node [draw, rectangle] {"\%s\textbackslash{}n"} }
+                    child { node [draw, rectangle] {"\%d\textbackslash{}n"} }
                     child { node [draw, rectangle] {+}
                             child { node [draw, rectangle] {n} }
                             child { node [draw, rectangle] {3} }
@@ -132,41 +132,6 @@ int main() {
         \node (semicolon2) [right=of zero] {\verb|;|};
         \node (rbracket) [right=of semicolon2] {\verb|}|};
     \end{tikzpicture}
-\end{frame}
-
-\begin{frame}[fragile]
-    \frametitle{Analyseur lexical}
-
-    {\usebox\chelloworld}
-
-    \hbox{
-        \begin{minipage}{0.5\textwidth}
-            \begin{lstlisting}
-type   value
-------------
-60     int
-6      main
-9      (
-10     )
-11     {
-6      printf
-9      (
-\end{lstlisting}
-        \end{minipage}
-        \begin{minipage}{0.5\textwidth}
-            \begin{lstlisting}
-type   value
-------------
-53     "Hello, world!\n"
-10     )
-39     ;
-60     return
-1      0
-39     ;
-12     }
-\end{lstlisting}
-        \end{minipage}
-    }
 \end{frame}
 
 
@@ -219,6 +184,42 @@ type   value
 \end{frame}
 
 
+\begin{frame}[fragile]
+    \frametitle{Analyseur lexical}
+
+    {\usebox\chelloworld}
+
+    \hbox{
+        \begin{minipage}{0.5\textwidth}
+            \begin{lstlisting}
+type   value
+------------
+60     int
+6      main
+9      (
+10     )
+11     {
+6      printf
+9      (
+\end{lstlisting}
+        \end{minipage}
+        \begin{minipage}{0.5\textwidth}
+            \begin{lstlisting}
+type   value
+------------
+53     "Hello, world!\n"
+10     )
+39     ;
+60     return
+1      0
+39     ;
+12     }
+\end{lstlisting}
+        \end{minipage}
+    }
+\end{frame}
+
+
 \subsection{Analyse syntaxique}
 \begin{frame}[fragile]
     \frametitle{Grammaire~: exemple de la grammaire française}
@@ -262,7 +263,7 @@ type   value
             \end{aligned}
             $
         };
-        \node at (-3,2) {Je mange une pomme};
+        \node at (-3,2) {Je mange une pomme.};
         \node at (-1,-2) {
             \footnotesize
             $
@@ -419,6 +420,7 @@ type   value
         E & \to d
     \end{align*}
 
+    $\{+cc, +cd, +dc, +dd\}$
     \pause
 
     \begin{align*}
@@ -608,7 +610,7 @@ type   value
 %\end{frame}
 
 \begin{frame}[fragile]
-    \frametitle{C n’est ni LL ni LR…}
+    \frametitle{C est ambigu…}
 
     \begin{center}
         \verb|x * y;|
@@ -650,4 +652,4 @@ type   value
 
 % Subsections left empty intentionally.
 \subsection{\textcolor{gray}{\emph{Compilation}}}
-\subsection{\textcolor{gray}{\emph{\'Edition de liens}}}
+%\subsection{\textcolor{gray}{\emph{\'Edition de liens}}}
