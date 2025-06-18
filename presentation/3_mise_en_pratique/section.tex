@@ -17,36 +17,36 @@
 
             \draw[-latex] (camlboot.east) to (ocaml_408_1.west);
 
-            \pause
+            \uncover<2->{
+                \node (ocaml_408_source) at (-4, -1) {Code source \texttt{OCaml} 4.08};
+                \node (ocaml_408_2) at (4, -1) {\texttt{OCaml} 4.08 \#2};
 
-            \node (ocaml_408_source) at (-4, -1) {Code source \texttt{OCaml} 4.08};
-            \node (ocaml_408_2) at (4, -1) {\texttt{OCaml} 4.08 \#2};
+                \draw[-latex] (ocaml_408_source.east) to (ocaml_408_2.west);
+                \draw[-latex] (ocaml_408_1.south) to (ocaml_408_2.north);
+            }
 
-            \draw[-latex] (ocaml_408_source.east) to (ocaml_408_2.west);
-            \draw[-latex] (ocaml_408_1.south) to (ocaml_408_2.north);
+            \uncover<3->{
+                \node (ocaml_409_source) at (-4, -2) {Code source \texttt{OCaml} 4.09};
+                \node (409_iterations) at (0, -2) {\emph{(x5)}};
+                \node (ocaml_409) at (4, -2) {\texttt{OCaml} 4.09};
 
-            \pause
+                \draw (ocaml_409_source.east) to (409_iterations.west);
+                \draw[-latex] (409_iterations.east) to (ocaml_409.west);
+                \draw[-latex] (ocaml_408_2.south) to (ocaml_409.north);
+            }
 
-            \node (ocaml_409_source) at (-4, -2) {Code source \texttt{OCaml} 4.09};
-            \node (409_iterations) at (0, -2) {\emph{(x5)}};
-            \node (ocaml_409) at (4, -2) {\texttt{OCaml} 4.09};
+            \uncover<4->{
+                \node (ocaml_530) at (4, -4) {\texttt{OCaml} 5.3.0};
+                \node (ocaml_530_iterations) at (4, -3) {\emph{(x51)}};
+                \node[align=center] (ocaml_source) at (-4, -3) {
+                    Code source \texttt{OCaml} \\
+                    \emph{(plusieurs versions)}
+                };
 
-            \draw (ocaml_409_source.east) to (409_iterations.west);
-            \draw[-latex] (409_iterations.east) to (ocaml_409.west);
-            \draw[-latex] (ocaml_408_2.south) to (ocaml_409.north);
-
-            \pause
-
-            \node (ocaml_530) at (4, -4) {\texttt{OCaml} 5.3.0};
-            \node (ocaml_530_iterations) at (4, -3) {\emph{(x51)}};
-            \node[align=center] (ocaml_source) at (-4, -3) {
-                Code source \texttt{OCaml} \\
-                \emph{(plusieurs versions)}
-            };
-
-            \draw (ocaml_409.south) to (ocaml_530_iterations.north);
-            \draw[-latex] (ocaml_530_iterations.south) to (ocaml_530.north);
-            \draw[-latex] (ocaml_source.east) to (ocaml_530_iterations.west);
+                \draw (ocaml_409.south) to (ocaml_530_iterations.north);
+                \draw[-latex] (ocaml_530_iterations.south) to (ocaml_530.north);
+                \draw[-latex] (ocaml_source.east) to (ocaml_530_iterations.west);
+            }
         \end{tikzpicture}
     \end{center}
 \end{frame}
@@ -148,21 +148,20 @@
                 \emph{\'Ecrit en BASIC}
             };
 
-            \pause
+            \uncover<2->{
+                \node (tcc) at (0, -2) {\boxed{\texttt{tcc}}};
+                \draw[-latex] (our_compiler.south) to (tcc.north);
+            }
 
-            \node (tcc) at (0, -2) {\boxed{\texttt{tcc}}};
-            \draw[-latex] (our_compiler.south) to (tcc.north);
+            \uncover<3->{
+                \node (gcc_474) at (0, -4) {\boxed{\texttt{gcc}} \emph{(Version 4.7.4)}};
+                \draw[-latex] (tcc.south) to (gcc_474.north);
+            }
 
-            \pause
-
-            \node (gcc_474) at (0, -4) {\boxed{\texttt{gcc}} \emph{(Version 4.7.4)}};
-            \draw[-latex] (tcc.south) to (gcc_474.north);
-
-            \pause
-
-            \node (gcc_1050) at (0, -6) {\boxed{\texttt{gcc}} \emph{(Version 10.5.0)}};
-            \draw[-latex] (gcc_474.south) to (gcc_1050.north);
-
+            \uncover<4->{
+                \node (gcc_1050) at (0, -6) {\boxed{\texttt{gcc}} \emph{(Version 10.5.0)}};
+                \draw[-latex] (gcc_474.south) to (gcc_1050.north);
+            }
         \end{tikzpicture}
     \end{center}
 \end{frame}
@@ -188,31 +187,36 @@
         \end{tikzpicture}
     \end{center}
 
-    \pause
-    \vspace{0.5cm}
+    \uncover<2->{
+        \vspace{0.5cm}
 
-    Pour compiler le programme suivant:
+        Pour compiler le programme suivant:
 
-    \mint{ocaml}|print_endline "Hello, World!";;|
+        \mint{ocaml}|print_endline "Hello, World!";;|
 
-    \vspace{0.5cm}
+        \vspace{0.5cm}
+    }
 
-    \begin{itemize}
-        \pause
-        \item XX heures de compilation
-              \pause
-        \item XX de fichiers g\'en\'er\'es \`a partir de XX de fichiers source
-    \end{itemize}
+    \uncover<3->{
+        \begin{itemize}
+            \item XX heures de compilation
+                  \uncover<4->{
+            \item XX de fichiers g\'en\'er\'es \`a partir de XX de fichiers source
+                  }
+        \end{itemize}
+    }
 
-    \pause
-    \vspace{0.5cm}
+    \uncover<5->{
+        \vspace{0.5cm}
 
-    Mais...
+        Mais...
 
-    \begin{itemize}
-        \item Une garantie quant \`a la sécurité de l'ex\'ecutable produit
-              \pause
-        \item Une preuve que le projet \texttt{OCaml} est reconstructible \`a
-              partir d'archives.
-    \end{itemize}
+        \begin{itemize}
+            \item Une garantie quant \`a la sécurité de l'ex\'ecutable produit
+                  \uncover<6->{
+            \item Une preuve que le projet \texttt{OCaml} est reconstructible \`a
+                  partir d'archives.
+                  }
+        \end{itemize}
+    }
 \end{frame}
