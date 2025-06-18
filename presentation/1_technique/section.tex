@@ -111,8 +111,35 @@
                 \draw (ocamlc_409.south) to [out=-90,in=90] (iterations.north);
                 \draw[-latex] (iterations.south) to [out=-90,in=90] (ocamlc_any.north);
             }
+
+            \uncover<6>{
+                \node[align=center] at (-3, -5) {
+                    \emph{On dit qu'on bootstrappe OCaml X.XX} \\
+                    \emph{\textbf{\`a partir} de OCaml 4.08}
+                };
+            }
         \end{tikzpicture}
     \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Premiere méthode : les cycles de bootstrapping\esp}
+
+    \begin{minted}{bash}
+cd /ocaml-bdcadbe
+
+cp -L /ocaml-167c070/boot/{ocamlc,ocamllex} boot
+
+./configure
+make -j$(nproc) coldstart
+make -j$(nproc) coreall
+make -j$(nproc) coreboot
+
+
+cd /ocaml-a36a533
+
+# ...
+    \end{minted}
 \end{frame}
 
 \subsection{Deuxième méthode : le bootstrapping "direct"}
@@ -132,7 +159,7 @@
                 \draw[-latex] (ocamlc_source.east) to (ocamlc_post.west);
             \end{tikzpicture}
         }
-        \only<2->{
+        \only<2-4>{
             \begin{tikzpicture}[in=180,out=0]
                 \node [align=center] (ocamlc_source) at (-3, 0.5) {
                     Code source \texttt{ocamlc} \\
@@ -148,17 +175,33 @@
                     \draw[-latex] (bootstrap_compiler.east) to (ocamlc_post.west);
                 }
             \end{tikzpicture}
+        }
+        \only<5->{
+            \begin{tikzpicture}[in=180,out=0]
+                \node [align=center] (gcc_source) at (-3, 0.5) {
+                    Code source \texttt{gcc} \\
+                    en \textbf{C}
+                };
+                \node (gcc_post) at (3, 0) {\boxed{\texttt{gcc}}};
 
-            \vspace{1cm}
+                \draw[-latex] (gcc_source.east) to (gcc_post.west);
 
-            \uncover<4->{
-                \begin{itemize}
-                    \item Ancienne version du compilateur (ici, \texttt{ocamlc})
-                          écrite en un autre langage.
-                    \item Compilateur/interpr\'eteur simpliste voué
-                          explicitement au bootstrapping du compilateur.
-                \end{itemize}
-            }
+                \node (bootstrap_compiler) at (-3, -0.5) {\textbf{Compilateur bootstrap}};
+
+                \draw[-latex] (bootstrap_compiler.east) to (gcc_post.west);
+
+            \end{tikzpicture}
+        }
+
+        \vspace{1cm}
+
+        \uncover<4->{
+            \begin{itemize}
+                \item Ancienne version du compilateur (ici, \texttt{ocamlc})
+                      écrite en un autre langage.
+                \item Compilateur/interpr\'eteur simpliste voué
+                      explicitement au bootstrapping du compilateur.
+            \end{itemize}
         }
     \end{center}
 \end{frame}
