@@ -3,7 +3,7 @@
 \begin{frame}
     \frametitle{Pourquoi bootstrapper~?\esp}
 
-    \begin{tikzpicture}[out=90, in=-90]
+    \begin{tikzpicture}[out=-90, in=90]
         \node (ocaml_source) at (-1, 0) {
             \begin{minipage}{\textwidth}
                 \mint{ocaml}|print_endline "Hello, World!";|
@@ -11,7 +11,7 @@
         };
 
         \uncover<2->{
-            \node (programme) at (-1, 2) {
+            \node (programme) at (-1, -2) {
                 Programme exécutable
             };
 
@@ -19,30 +19,30 @@
                 \boxed{\texttt{ocamlc}}
             };
 
-            \draw[-latex] (ocaml_source.north) to (programme.south);
-            \draw[-latex] (ocamlc.north) to (programme.south);
+            \draw[-latex] (ocaml_source.south) to (programme.north);
+            \draw[-latex] (ocamlc.south) to (programme.north);
         }
 
         \uncover<3->{
-            \node (hand_written) at (-1, -2) {Écrit à la main};
+            \node (hand_written) at (-1, 2) {Écrit à la main};
 
-            \draw [-latex] (hand_written.north) to (ocaml_source.south);
+            \draw [-latex] (hand_written.south) to (ocaml_source.north);
         }
 
         \uncover<4>{
-            \node (bootstrap) at (3, -2) {
+            \node (bootstrap) at (3, 2) {
                 ?
             };
 
-            \draw[-latex] (bootstrap.north) to (ocamlc.south);
+            \draw[-latex] (bootstrap.south) to (ocamlc.north);
         }
 
-        \uncover<5>{
-            \node (bootstrap) at (3, -2) {
+        \uncover<5->{
+            \node (bootstrap) at (3, 2) {
                 \textbf{Bootstrap}
             };
 
-            \draw[-latex] (bootstrap.north) to (ocamlc.south);
+            \draw[-latex] (bootstrap.south) to (ocamlc.north);
         }
     \end{tikzpicture}
 
